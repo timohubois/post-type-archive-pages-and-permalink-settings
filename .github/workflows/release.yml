@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  release-please:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/release-please-action@v3
+        with:
+          release-type: php
+          package-name: archive-pages-and-permalink-settings-for-post-types-and-taxonomies
+          extra-files: |
+            readme.txt
+            archive-pages-and-permalink-settings-for-post-types-and-taxonomies.php
+
+      - name: Setup Environment
+        if: ${{ steps.release.outputs.release_created }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          extensions: zip, imagick, gd
+
+      - name: Install composer
+        if: ${{ steps.release.outputs.release_created }}
+        run: composer install --no-dev --no-progress --no-suggest --optimize-autoloader
+
+      - name: Create archive
+        if: ${{ steps.release.outputs.release_created }}
+        run: zip -r ${{ github.event.repository.name }}-${{ steps.release.outputs.tag_name }}.zip ./ -x@.distignore
+
+      - name: Upload Release Artifact
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run:
+          gh release upload ${{ steps.release.outputs.tag_name }} ./${{ github.event.repository.name }}-${{ steps.release.outputs.tag_name }}.zip

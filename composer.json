@@ -1,0 +1,40 @@
+{
+    "name": "timohubois/post-type-and-taxonomy-archive-pages",
+    "description": "Set the archive for your custom post types to associate them with a specific page and control the permalinks for single custom post type pages and custom taxonomies.",
+    "type": "wordpress-plugin",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Timo Hubois",
+            "email": "t.hubois@pixelsaft.de"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "process-timeout": 2000,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "phpcompatibility/phpcompatibility-wp": "^2.1",
+        "wp-cli/wp-cli-bundle": "^2.8",
+        "wp-coding-standards/wpcs": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ptapas\\": "classes/"
+        }
+    },
+    "scripts": {
+        "php:lint": "vendor/bin/phpcs --standard=phpcs.xml .",
+        "php:lint:fix": "vendor/bin/phpcbf --standard=phpcs.xml ."
+    }
+}
