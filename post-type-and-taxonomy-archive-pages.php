@@ -31,4 +31,6 @@ if (!defined('APAPS_TEXT_DOMAIN')) {
     define('APAPS_TEXT_DOMAIN', get_file_data(APAPS_PLUGIN_FILE, [ 'TextDomain' => 'Text Domain'], 'plugin')['TextDomain']);
 }
 
+load_plugin_textdomain(APAPS_TEXT_DOMAIN);
+
 Plugin::init();
