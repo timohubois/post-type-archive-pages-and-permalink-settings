@@ -34,14 +34,14 @@ class OptionsReadingPostTypes
     {
         $this->options = apply_filters(APAPS_TEXT_DOMAIN . '_post_type_reading_settings', $this->options);
 
-        if ($this->allOptionsAreEmpty($this->options)) {
+        if ($this->isOptionsEmpty($this->options)) {
             return false;
         }
 
         return $this->options;
     }
 
-    private function allOptionsAreEmpty(array|bool $options): bool
+    private function isOptionsEmpty(array|bool $options): bool
     {
         if (is_bool($options)) {
             return $options;
