@@ -33,4 +33,7 @@ if (!defined('APAPS_TEXT_DOMAIN')) {
 
 load_plugin_textdomain(APAPS_TEXT_DOMAIN);
 
+register_activation_hook(APAPS_PLUGIN_FILE, [Plugin::class, 'onPluginActivation']);
+register_deactivation_hook(APAPS_PLUGIN_FILE, [Plugin::class, 'onPluginDeactivation']);
+
 Plugin::init();

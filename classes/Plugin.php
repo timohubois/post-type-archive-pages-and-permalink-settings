@@ -41,4 +41,14 @@ class Plugin
 
         return $instances;
     }
+
+    public static function onPluginActivation(): void
+    {
+        flush_rewrite_rules();
+    }
+
+    public static function onPluginDeactivation(): void
+    {
+        flush_rewrite_rules();
+    }
 }
