@@ -21,10 +21,9 @@ class SetArchivesAndSlugs
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
         if (!empty($optionsReadingPostTypes[$postType])) {
             $postTypeArchivePageId = $optionsReadingPostTypes[$postType];
-            $postName = get_post_field('post_name', $postTypeArchivePageId);
 
             $args['has_archive'] = get_page_uri($postTypeArchivePageId);
-            $args['rewrite']['slug'] = $postName;
+            $args['rewrite']['slug'] = get_page_uri($postTypeArchivePageId);
         }
 
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
