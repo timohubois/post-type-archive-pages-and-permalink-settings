@@ -95,12 +95,12 @@ class OptionsReadingPostTypes
         <p class="description"><?php _e('Select the page to display the archive for each post type.', APAPS_TEXT_DOMAIN); ?></p>
         <br>
         <fieldset>
-            <?php foreach ($supportedPostTypes as $post_type) { ?>
+            <?php foreach ($supportedPostTypes as $postType) { ?>
                 <label for="<?php echo $optionName ?>">
                     <?php
                     printf(
                         '%1$s %2$s',
-                        $post_type->label,
+                        $postType->label,
                         __('page:', APAPS_TEXT_DOMAIN)
                     )
                     ?>
@@ -109,11 +109,11 @@ class OptionsReadingPostTypes
                         '%s',
                         wp_dropdown_pages(
                             [
-                                'name' => "{$optionName}[{$post_type->name}]",
+                                'name' => "{$optionName}[{$postType->name}]",
                                 'echo' => 0,
                                 'show_option_none' => __('&mdash; Select &mdash;'),
                                 'option_none_value' => '0',
-                                'selected' => is_array($this->options) && $this->options[$post_type->name] ? $this->options[$post_type->name] : null
+                                'selected' => is_array($this->options) && $this->options[$postType->name] ? $this->options[$postType->name] : null
                             ]
                         )
                     );
