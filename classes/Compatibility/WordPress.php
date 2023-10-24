@@ -240,13 +240,16 @@ class WordPress
         $queriedObject = get_queried_object();
         $postType = $queriedObject->name ?? null;
         $postTypeArchivePageId = OptionsReadingPostTypes::getInstance()->getOptions()[$postType] ?? null;
-
         if ($postTypeArchivePageId) {
             $editPostLink = get_edit_post_link($postTypeArchivePageId);
             $wpAdminBar->add_menu(
                 [
                     'id' => 'edit',
-                    'title' => __('Edit Page'),
+                    'title' => sprintf(
+                        '%1$s %2$s',
+                        __('Edit', APAPS_TEXT_DOMAIN),
+                        self::getArchivePagePostTypeName($postTypeArchivePageId)
+                    ),
                     'href' => $editPostLink,
                     'parent' => false,
                 ]
@@ -256,14 +259,16 @@ class WordPress
 
     public function addPostStateLabel(array $postStates, WP_Post $post): array
     {
-
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
         $postTypes = SupportedPostTypes::getInstance()->getPostTypes();
         foreach ($postTypes as $postType) {
             $postTypeArchivePageId = $optionsReadingPostTypes[$postType->name] ?? null;
 
             if ((int)$postTypeArchivePageId && $post->ID == $postTypeArchivePageId) {
-                $postStates[] = sprintf('%1$s %2$s', $postType->labels->archives ?? $postType->labels->name, __('Page', APAPS_TEXT_DOMAIN));
+                $postStates[] = sprintf(
+                    '%1$s',
+                    $postType->labels->archives ?? $postType->labels->name
+                );
             }
         }
 
@@ -288,5 +293,20 @@ class WordPress
                 return;
             }
         }
+    }
+
+    private static function getArchivePagePostTypeName($postTypeArchivePageId)
+    {
+        $isPage = (get_post_field('post_type', $postTypeArchivePageId) === 'page');
+        if ($isPage) {
+            return __('Page', APAPS_TEXT_DOMAIN);
+        }
+
+        $archivePagePostType = get_post_type($postTypeArchivePageId);
+        if (is_object($archivePagePostType) && isset($archivePagePostType->labels->name)) {
+            return $archivePagePostType->labels->name;
+        }
+
+        return '';
     }
 }
