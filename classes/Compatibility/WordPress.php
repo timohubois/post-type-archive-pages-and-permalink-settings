@@ -34,12 +34,11 @@ class WordPress
     {
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
+        $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
 
-        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes)) {
+        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes) || empty($supportedPostTypes)) {
             return;
         }
-
-        $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
 
         foreach ($supportedPostTypes as $postType) {
             $postTypeArchivePageId = $optionsReadingPostTypes[$postType->query_var] ?? null;
@@ -68,7 +67,11 @@ class WordPress
             $taxonomySlug = $optionsPermalinksTaxonomies[$taxonomy] ?? null;
 
             if ($taxonomySlug) {
-                $filteredRules = array_filter($rules, fn ($key) => strpos($key, $taxonomySlug) === 0, ARRAY_FILTER_USE_KEY);
+                $filteredRules = array_filter(
+                    $rules,
+                    fn ($key) => strpos($key, $taxonomySlug) === 0,
+                    ARRAY_FILTER_USE_KEY
+                );
                 $nonMatchingRules = array_diff_key($rules, $filteredRules);
                 $rules = $filteredRules + $nonMatchingRules;
             }
@@ -84,15 +87,15 @@ class WordPress
             return;
         }
 
-        $postTypes = SupportedPostTypes::getInstance()->getPostTypes();
-        if (empty($postTypes)) {
-            return;
-        }
-
+        $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
 
-        foreach ($postTypes as $postType) {
+        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes) || empty($supportedPostTypes)) {
+            return;
+        }
+
+        foreach ($supportedPostTypes as $postType) {
             $postTypeArchivePage = $optionsReadingPostTypes[$postType->query_var] ?? null;
             $postTypeSlug = $optionsPermalinksPostTypes[$postType->query_var] ?? null;
             if ($wp_query->query['name'] === $postTypeSlug && $postTypeArchivePage) {
@@ -136,9 +139,9 @@ class WordPress
     {
         $queriedObject = get_queried_object();
         $taxonomy = $queriedObject->taxonomy ?? null;
-        $optionsPermalinksTaxonomy = OptionsPermalinksTaxonomies::getInstance()->getOptions()[$taxonomy] ?? null;
+        $taxonomyPermalinkOption = OptionsPermalinksTaxonomies::getInstance()->getOptions()[$taxonomy] ?? null;
 
-        if ($optionsPermalinksTaxonomy) {
+        if ($taxonomyPermalinkOption) {
             return esc_attr($queriedObject->name);
         }
 
@@ -260,8 +263,13 @@ class WordPress
     public function addPostStateLabel(array $postStates, WP_Post $post): array
     {
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-        $postTypes = SupportedPostTypes::getInstance()->getPostTypes();
-        foreach ($postTypes as $postType) {
+        $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
+
+        if (empty($optionsReadingPostTypes) || empty($supportedPostTypes)) {
+            return $postStates;
+        }
+
+        foreach ($supportedPostTypes as $postType) {
             $postTypeArchivePageId = $optionsReadingPostTypes[$postType->name] ?? null;
 
             if ((int)$postTypeArchivePageId && $post->ID == $postTypeArchivePageId) {
@@ -287,6 +295,9 @@ class WordPress
         }
 
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+        if (empty($optionsReadingPostTypes)) {
+            return;
+        }
         foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
             if ((int)$postTypeArchivePageId === $postId) {
                 FlushRewriteRules::getInstance()->setup();

@@ -35,7 +35,7 @@ class SupportedPostTypes
         $postTypes = array_filter($postTypes, 'post_type_exists');
         $postTypes = array_map('get_post_type_object', $postTypes);
 
-        return $postTypes;
+        return $postTypes ?? [];
     }
 
     public function getPostTypes()

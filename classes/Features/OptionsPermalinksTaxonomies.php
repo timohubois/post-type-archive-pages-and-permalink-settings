@@ -30,7 +30,25 @@ class OptionsPermalinksTaxonomies
 
     public function getOptions(): array|bool
     {
+        if ($this->isOptionsEmpty($this->options)) {
+            return false;
+        }
+
         return $this->options;
+    }
+
+    private function isOptionsEmpty(array|bool $options): bool
+    {
+        if (is_bool($options)) {
+            return $options;
+        }
+
+        foreach ($options as $value) {
+            if (!empty($value)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static function deleteOptions() {

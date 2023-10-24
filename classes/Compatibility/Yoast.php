@@ -21,6 +21,11 @@ class Yoast
     {
         if ($post_type === 'page') {
             $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+
+            if (empty($optionsReadingPostTypes)) {
+                return;
+            }
+
             foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
                 if ((int)$postTypeArchivePageId === $post->ID) {
                     remove_meta_box('wpseo_meta', 'page', 'normal');
@@ -33,6 +38,11 @@ class Yoast
     {
         global $post;
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+
+        if (empty($optionsReadingPostTypes)) {
+            return;
+        }
+
         foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
             if ((int)$postTypeArchivePageId === $post->ID) {
                 $title = 'YOAST SEO meta box is disabled for this Custom Post Type archive page!';

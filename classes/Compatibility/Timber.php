@@ -17,7 +17,8 @@ class Timber
     {
         $queriedObject = get_queried_object();
         $taxonomy = $queriedObject->taxonomy ?? null;
-        $postType = isset(get_taxonomy($taxonomy)->object_type[0]) ? get_taxonomy($taxonomy)->object_type[0] : $queriedObject->name ?? null;
+        $postType = isset(get_taxonomy($taxonomy)->object_type[0])
+            ? get_taxonomy($taxonomy)->object_type[0] : $queriedObject->name ?? null;
 
         $postTypeArchivePageId = OptionsReadingPostTypes::getInstance()->getOptions()[$postType] ?? null;
 

@@ -90,12 +90,14 @@ class OptionsReadingPostTypes
             return;
         }
 
-        $optionName = self::OPTION_NAME;
         ?>
         <p class="description"><?php _e('Select the page to display the archive for each post type.', APAPS_TEXT_DOMAIN); ?></p>
         <br>
         <fieldset>
-            <?php foreach ($supportedPostTypes as $postType) { ?>
+            <?php foreach ($supportedPostTypes as $postType) {
+                     $optionName = self::OPTION_NAME;
+                     $selected = is_array($this->options) && $this->options[$postType->name] ? $this->options[$postType->name] : null
+             ?>
                 <label for="<?php echo $optionName ?>">
                     <?php
                     printf(
@@ -113,7 +115,7 @@ class OptionsReadingPostTypes
                                 'echo' => 0,
                                 'show_option_none' => __('&mdash; Select &mdash;'),
                                 'option_none_value' => '0',
-                                'selected' => is_array($this->options) && $this->options[$postType->name] ? $this->options[$postType->name] : null
+                                'selected' => $selected
                             ]
                         )
                     );
