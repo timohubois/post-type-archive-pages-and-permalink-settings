@@ -36,7 +36,7 @@ class Wpml
             return $postTypeReadingSettings;
         }
 
-        $currentLanguage = isset($_GET['lang']) ? $_GET['lang'] : apply_filters('wpml_current_language', null);
+        $currentLanguage = isset($_GET['lang']) ? sanitize_text_field(wp_unslash($_GET['lang'])) : apply_filters('wpml_current_language', null);
 
         foreach ($postTypeReadingSettings as $postType => $value) {
             $postTypeReadingSettings[$postType] = $this->getWpmlObjectId($value, $postType, $currentLanguage);
@@ -51,7 +51,7 @@ class Wpml
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
         $languages = apply_filters('wpml_active_languages', [], 'skip_missing=0');
 
-        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes)|| empty($languages)) {
+        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes) || empty($languages)) {
             return;
         }
 
@@ -169,7 +169,8 @@ class Wpml
 
             $pageForArchiveUris = [];
             foreach ($languages as $language) {
-                $pageForArchiveUris[] = $this->getPageForArchiveUri($postId, $language['code']);;
+                $pageForArchiveUris[] = $this->getPageForArchiveUri($postId, $language['code']);
+                ;
             }
 
             if (empty($pageForArchiveUris)) {

@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 class FlushRewriteRules
 {
-    private $transientName = 'apaps_flush_rewrites';
+    private $transientName = 'ptapaps_flush_rewrites';
     private static $instance = null;
 
     public function __construct()

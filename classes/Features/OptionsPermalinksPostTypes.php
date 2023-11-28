@@ -8,7 +8,7 @@ use Ptapas\Features\SupportedPostTypes;
 
 class OptionsPermalinksPostTypes
 {
-    const OPTION_NAME = 'apaps_post_type_permalink';
+    const OPTION_NAME = 'ptapaps_post_type_permalink';
 
     private static $instance = null;
     private $options = false;
@@ -51,7 +51,8 @@ class OptionsPermalinksPostTypes
         return true;
     }
 
-    public static function deleteOptions() {
+    public static function deleteOptions()
+    {
         delete_option(self::OPTION_NAME);
     }
 
@@ -65,9 +66,12 @@ class OptionsPermalinksPostTypes
 
         $optionName = self::OPTION_NAME;
 
+        // phpcs:disable WordPress.Security.NonceVerification.Missing
         if (isset($_POST[$optionName])) {
-            update_option($optionName, $_POST[$optionName]);
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized --its sanitized
+            update_option($optionName, $this->sanitizeArray(wp_unslash($_POST[$optionName])));
         }
+        // phpcs:enable WordPress.Security.NonceVerification.Missing
 
         add_settings_field(
             $optionName,
@@ -93,7 +97,7 @@ class OptionsPermalinksPostTypes
 
         $optionName = self::OPTION_NAME; ?>
         <p class="description">
-            <strong><?php _e('Notice: Tags are not tested nor supported!', APAPS_TEXT_DOMAIN); ?></strong>
+            <strong><?php esc_html_e('Notice: Tags are not tested nor supported!', APAPS_TEXT_DOMAIN); ?></strong>
         </p>
         <br>
         <fieldset>
@@ -114,17 +118,30 @@ class OptionsPermalinksPostTypes
                     $withFront ? 'true' : 'false'
                 );
                 ?>
-                <label for="<?php echo $optionName ?>">
-                    <strong><?php echo $post_type->label; ?> <?php _e('base', APAPS_TEXT_DOMAIN) ?> </strong><br>
-                    <code><?php echo home_url() . '/'; ?></code>
-                    <input type="text" name="<?php echo $name ?>" value="<?php echo $value ?>" placeholder="<?php echo $placeholder ?>" />
+                <label for="<?php echo esc_attr($optionName) ?>">
+                    <strong><?php echo esc_html($post_type->label); ?> <?php esc_html_e('base', APAPS_TEXT_DOMAIN) ?> </strong><br>
+                    <code><?php echo esc_url(home_url()) . '/'; ?></code>
+                    <input type="text" name="<?php echo esc_attr($name) ?>" value="<?php echo esc_attr($value) ?>" placeholder="<?php echo esc_attr($placeholder) ?>" />
                     <code>/%postname%/</code><br>
                     <span class="description">
-                        <?php echo $description ?>
+                        <?php echo esc_html($description) ?>
                     </span>
                 </label><br>
             <?php } ?>
         </fieldset>
         <?php
+    }
+
+    public function sanitizeArray($array)
+    {
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) {
+                $value = $this->sanitizeArray($value);
+            } else {
+                $value = sanitize_text_field($value);
+            }
+        }
+
+        return $array;
     }
 }

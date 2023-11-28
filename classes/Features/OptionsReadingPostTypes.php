@@ -9,7 +9,7 @@ use Ptapas\Features\SupportedPostTypes;
 
 class OptionsReadingPostTypes
 {
-    const OPTION_NAME = 'ptapapst_post_type_reading_settings';
+    const OPTION_NAME = 'ptapaps_post_type_reading_settings';
 
     private static $instance = null;
     private $options = false;
@@ -55,7 +55,8 @@ class OptionsReadingPostTypes
         return true;
     }
 
-    public static function deleteOptions() {
+    public static function deleteOptions()
+    {
         delete_option(self::OPTION_NAME);
     }
 
@@ -91,24 +92,25 @@ class OptionsReadingPostTypes
         }
 
         ?>
-        <p class="description"><?php _e('Select the page to display the archive for each post type.', APAPS_TEXT_DOMAIN); ?></p>
+        <p class="description"><?php esc_html_e('Select the page to display the archive for each post type.', APAPS_TEXT_DOMAIN); ?></p>
         <br>
         <fieldset>
             <?php foreach ($supportedPostTypes as $postType) {
                      $optionName = self::OPTION_NAME;
                      $selected = is_array($this->options) && $this->options[$postType->name] ? $this->options[$postType->name] : null
-             ?>
-                <label for="<?php echo $optionName ?>">
+                ?>
+                <label for="<?php echo esc_attr($optionName) ?>">
                     <?php
                     printf(
                         '%1$s %2$s',
-                        $postType->label,
-                        __('page:', APAPS_TEXT_DOMAIN)
+                        esc_html($postType->label),
+                        esc_html__('page:', APAPS_TEXT_DOMAIN)
                     )
                     ?>
                     <?php
                     printf(
                         '%s',
+                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                         wp_dropdown_pages(
                             [
                                 'name' => "{$optionName}[{$postType->name}]",
