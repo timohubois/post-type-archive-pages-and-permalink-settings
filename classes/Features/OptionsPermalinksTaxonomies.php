@@ -66,12 +66,15 @@ class OptionsPermalinksTaxonomies
 
         $optionName = self::OPTION_NAME;
 
-        // phpcs:disable WordPress.Security.NonceVerification.Missing
         if (isset($_POST[$optionName])) {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized --wp_verify_nonce sanitizes the input
+            if (!isset($_POST['optionsPermalinksTaxonomies_nonce']) || !wp_verify_nonce(wp_unslash($_POST['optionsPermalinksTaxonomies_nonce']), 'optionsPermalinksTaxonomies_update_option')) {
+                return;
+            }
+
             // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized --its sanitized
             update_option($optionName, $this->sanitizeOptionsArray(wp_unslash($_POST[$optionName])));
         }
-        // phpcs:enable WordPress.Security.NonceVerification.Missing
 
         add_settings_field(
             $optionName,
@@ -94,8 +97,9 @@ class OptionsPermalinksTaxonomies
         if (empty($supportedTaxonomies)) {
             return;
         }
-
         $optionName = self::OPTION_NAME;
+
+        wp_nonce_field('optionsPermalinksTaxonomies_update_option', 'optionsPermalinksTaxonomies_nonce');
         ?>
         <p class="description">
             <strong><?php esc_html_e('Notice: Tags are not tested nor supported!', APAPS_TEXT_DOMAIN); ?></strong>
