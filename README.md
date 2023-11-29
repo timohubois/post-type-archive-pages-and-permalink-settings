@@ -13,14 +13,13 @@ The Plugin extends the native **Reading** and **Permalinks** settings pages:
 
 ## Installation
 
-1. Clone the repository and place it in `wp-content/plugins/` folder.
-2. Make sure you have the correct [requirements](#requirements).
-3. Run `composer i --no-dev` to install composer dependency without its dev requirements.
+1. Make sure you have the correct [requirements](#requirements).
+2. Clone the repository and place it in `wp-content/plugins/` folder.
 
 ## Development
 
-1. Perform [Installation](#installation).
-2. Make sure you have the correct [requirements](#requirements).
+1. Make sure you have the correct [requirements](#requirements).
+2. Perform [Installation](#installation).
 3. Run `composer i` to install composer dependency.
 
 ## License
