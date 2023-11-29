@@ -8,7 +8,7 @@ class PluginActionLinks
 {
     public function __construct()
     {
-        add_filter('plugin_action_links_' . plugin_basename(APAPS_PLUGIN_FILE), [$this, 'addActionLinks']);
+        add_filter('plugin_action_links_' . plugin_basename(PTAPAPS_PLUGIN_FILE), [$this, 'addActionLinks']);
     }
 
     public function addActionLinks(array $links): array

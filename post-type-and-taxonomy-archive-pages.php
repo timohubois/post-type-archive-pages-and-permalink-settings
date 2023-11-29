@@ -19,8 +19,8 @@ namespace Ptapas;
 
 defined('ABSPATH') || exit;
 
-if (!defined('APAPS_PLUGIN_FILE')) {
-    define('APAPS_PLUGIN_FILE', __FILE__);
+if (!defined('PTAPAPS_PLUGIN_FILE')) {
+    define('PTAPAPS_PLUGIN_FILE', __FILE__);
 }
 
 if (file_exists(plugin_dir_path(APAPS_PLUGIN_FILE) . 'vendor/autoload.php')) {
@@ -28,12 +28,12 @@ if (file_exists(plugin_dir_path(APAPS_PLUGIN_FILE) . 'vendor/autoload.php')) {
 }
 
 if (!defined('APAPS_TEXT_DOMAIN')) {
-    define('APAPS_TEXT_DOMAIN', get_file_data(APAPS_PLUGIN_FILE, [ 'TextDomain' => 'Text Domain'], 'plugin')['TextDomain']);
+    define('APAPS_TEXT_DOMAIN', get_file_data(PTAPAPS_PLUGIN_FILE, [ 'TextDomain' => 'Text Domain'], 'plugin')['TextDomain']);
 }
 
-load_plugin_textdomain(APAPS_TEXT_DOMAIN);
+load_plugin_textdomain(PTAPAPS_PLUGIN_FILE);
 
-register_activation_hook(APAPS_PLUGIN_FILE, [Plugin::class, 'onPluginActivation']);
-register_deactivation_hook(APAPS_PLUGIN_FILE, [Plugin::class, 'onPluginDeactivation']);
+register_activation_hook(PTAPAPS_PLUGIN_FILE, [Plugin::class, 'onPluginActivation']);
+register_deactivation_hook(PTAPAPS_PLUGIN_FILE, [Plugin::class, 'onPluginDeactivation']);
 
 Plugin::init();
