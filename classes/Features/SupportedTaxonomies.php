@@ -12,6 +12,10 @@ class SupportedTaxonomies
     public function __construct()
     {
         $this->taxonomies = $this->getSupportedTaxonomies();
+
+        add_action('init', function () {
+            $this->taxonomies = $this->getSupportedTaxonomies();
+        }, PHP_INT_MAX);
     }
 
     public static function getInstance(): SupportedTaxonomies
