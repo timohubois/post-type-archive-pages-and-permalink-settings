@@ -12,6 +12,10 @@ class SupportedPostTypes
     public function __construct()
     {
         $this->postTypes = $this->getSupportedPostTypes();
+
+        add_action('init', function () {
+            $this->postTypes = $this->getSupportedPostTypes();
+        }, PHP_INT_MAX);
     }
 
     public static function getInstance(): SupportedPostTypes
