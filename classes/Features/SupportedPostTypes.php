@@ -22,7 +22,7 @@ class SupportedPostTypes
         return self::$instance;
     }
 
-    private function getSupportedPostTypes()
+    private function getSupportedPostTypes(): array
     {
 
         $postTypes = get_post_types(
@@ -38,7 +38,7 @@ class SupportedPostTypes
         return $postTypes ?? [];
     }
 
-    public function getPostTypes()
+    public function getPostTypes(): array
     {
         return $this->postTypes = $this->postTypes ?: $this->getSupportedPostTypes();
     }

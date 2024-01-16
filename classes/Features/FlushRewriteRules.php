@@ -22,7 +22,7 @@ class FlushRewriteRules
         return self::$instance;
     }
 
-    public function maybeFlushRewriteRules()
+    public function maybeFlushRewriteRules(): void
     {
 
         if (delete_transient($this->transientName)) {
@@ -30,7 +30,7 @@ class FlushRewriteRules
         }
     }
 
-    public function setup()
+    public function setup(): void
     {
         set_transient($this->transientName, true);
     }

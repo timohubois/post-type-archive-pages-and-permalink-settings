@@ -51,12 +51,12 @@ class OptionsPermalinksPostTypes
         return true;
     }
 
-    public static function deleteOptions()
+    public static function deleteOptions(): void
     {
         delete_option(self::OPTION_NAME);
     }
 
-    public function addSettings()
+    public function addSettings(): void
     {
         $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
 
@@ -102,7 +102,7 @@ class OptionsPermalinksPostTypes
         );
     }
 
-    public function renderOptionsSettingsField()
+    public function renderOptionsSettingsField(): void
     {
         $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
         if (empty($supportedPostTypes)) {

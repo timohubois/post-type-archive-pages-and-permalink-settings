@@ -22,7 +22,7 @@ class SupportedTaxonomies
         return self::$instance;
     }
 
-    private function getSupportedTaxonomies()
+    private function getSupportedTaxonomies(): array
     {
 
         $taxonomies = get_taxonomies(
@@ -40,6 +40,6 @@ class SupportedTaxonomies
 
     public function getTaxonomies()
     {
-        return $this->taxonomies = $this->taxonomies ?: $this->getSupportedTaxonomies();;
+        return $this->taxonomies = $this->taxonomies ?: $this->getSupportedTaxonomies();
     }
 }

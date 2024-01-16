@@ -217,7 +217,7 @@ class WordPress
         return $sortedMenuItems;
     }
 
-    protected function recursiveAddAncestor($child, $items)
+    protected function recursiveAddAncestor($child, $items): array
     {
 
         if (!intval($child->menu_item_parent)) {
@@ -291,7 +291,7 @@ class WordPress
         return $postStates;
     }
 
-    public function postUpdated(int $postId, WP_Post $postAfter, WP_Post $postBefore)
+    public function postUpdated(int $postId, WP_Post $postAfter, WP_Post $postBefore): void
     {
 
         if ($postAfter->post_type !== 'page') {
@@ -314,7 +314,7 @@ class WordPress
         }
     }
 
-    private static function getArchivePagePostTypeName($postTypeArchivePageId)
+    private static function getArchivePagePostTypeName($postTypeArchivePageId): string
     {
         $isPage = (get_post_field('post_type', $postTypeArchivePageId) === 'page');
         if ($isPage) {

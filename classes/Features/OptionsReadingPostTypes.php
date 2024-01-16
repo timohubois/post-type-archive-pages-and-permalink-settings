@@ -55,12 +55,12 @@ class OptionsReadingPostTypes
         return true;
     }
 
-    public static function deleteOptions()
+    public static function deleteOptions(): void
     {
         delete_option(self::OPTION_NAME);
     }
 
-    public function addSettings()
+    public function addSettings(): void
     {
         $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
 
@@ -83,7 +83,7 @@ class OptionsReadingPostTypes
         );
     }
 
-    public function renderSettings()
+    public function renderSettings(): void
     {
         $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
 
@@ -124,7 +124,7 @@ class OptionsReadingPostTypes
         <?php
     }
 
-    public function maybeFlushRewriteRules(mixed $old_value, mixed $value)
+    public function maybeFlushRewriteRules(mixed $old_value, mixed $value): void
     {
         if ($old_value === $value) {
             return;

@@ -51,12 +51,12 @@ class OptionsPermalinksTaxonomies
         return true;
     }
 
-    public static function deleteOptions()
+    public static function deleteOptions(): void
     {
         delete_option(self::OPTION_NAME);
     }
 
-    public function addSettings()
+    public function addSettings(): void
     {
         $supportedTaxonomies = SupportedTaxonomies::getInstance()->getTaxonomies();
 
@@ -102,7 +102,7 @@ class OptionsPermalinksTaxonomies
         );
     }
 
-    public function renderOptionsSettingsField()
+    public function renderOptionsSettingsField(): void
     {
         $supportedTaxonomies = SupportedTaxonomies::getInstance()->getTaxonomies();
 
