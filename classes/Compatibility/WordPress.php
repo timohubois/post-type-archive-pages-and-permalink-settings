@@ -276,7 +276,7 @@ class WordPress
         foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
             $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
             $postTypeLabel = $supportedPostTypes[$postType]->labels->archives ??
-                $supportedPostTypes[$postType]->labels->name;
+                $supportedPostTypes[$postType]->labels->name ?? null;
 
             if ((int)$postTypeArchivePageId && (int)$post->ID === (int)$postTypeArchivePageId) {
                 $postStates[] = sprintf(
