@@ -1,12 +1,12 @@
 <?php
 
-namespace Ptapas\Features;
+namespace Ptatap\Features;
 
 defined('ABSPATH') || exit;
 
 class FlushRewriteRules
 {
-    private $transientName = 'ptapaps_flush_rewrites';
+    private $transientName = 'ptatap_flush_rewrites';
     private static $instance = null;
 
     public function __construct()

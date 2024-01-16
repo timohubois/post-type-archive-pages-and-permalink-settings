@@ -1,8 +1,8 @@
 <?php
 
-namespace Ptapas\Compatibility;
+namespace Ptatap\Compatibility;
 
-use Ptapas\Features\OptionsReadingPostTypes;
+use Ptatap\Features\OptionsReadingPostTypes;
 use WP_Post;
 
 defined('ABSPATH') || exit;
@@ -57,7 +57,7 @@ class Yoast
                     "</a>",
                     "<strong>",
                     $postTypeObject->labels->name,
-                    __(" archive", APAPS_TEXT_DOMAIN),
+                    __(" archive", 'post-type-and-taxonomy-archive-pages'),
                     "</strong>"
                 );
 

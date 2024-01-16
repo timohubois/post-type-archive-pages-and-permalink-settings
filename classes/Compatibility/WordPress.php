@@ -1,12 +1,12 @@
 <?php
 
-namespace Ptapas\Compatibility;
+namespace Ptatap\Compatibility;
 
-use Ptapas\Features\FlushRewriteRules;
-use Ptapas\Features\OptionsPermalinksPostTypes;
-use Ptapas\Features\OptionsPermalinksTaxonomies;
-use Ptapas\Features\OptionsReadingPostTypes;
-use Ptapas\Features\SupportedPostTypes;
+use Ptatap\Features\FlushRewriteRules;
+use Ptatap\Features\OptionsPermalinksPostTypes;
+use Ptatap\Features\OptionsPermalinksTaxonomies;
+use Ptatap\Features\OptionsReadingPostTypes;
+use Ptatap\Features\SupportedPostTypes;
 use WP_Admin_Bar;
 use WP_Post;
 
@@ -83,7 +83,10 @@ class WordPress
     public function redirectPostTypeSlugToArchivePage(): void
     {
         global $wp_query;
-        if (!isset($wp_query->query['name'])) {
+
+        $isNameOrPageNameSet = isset($wp_query->query['name']) || isset($wp_query->query['pagename']);
+
+        if (!$isNameOrPageNameSet) {
             return;
         }
 
@@ -98,7 +101,15 @@ class WordPress
         foreach ($supportedPostTypes as $postType) {
             $postTypeArchivePage = $optionsReadingPostTypes[$postType->query_var] ?? null;
             $postTypeSlug = $optionsPermalinksPostTypes[$postType->query_var] ?? null;
-            if ($wp_query->query['name'] === $postTypeSlug && $postTypeArchivePage) {
+
+            if (!$postTypeArchivePage) {
+                continue;
+            }
+
+            if (
+                (isset($wp_query->query['name']) && $wp_query->query['name'] === $postTypeSlug && $postTypeArchivePage) ||
+                (isset($wp_query->query['pagename']) && $wp_query->query['pagename'] === $postTypeSlug && $postTypeArchivePage)
+            ) {
                 wp_redirect(get_post_type_archive_link($postType->query_var), 301);
                 exit();
             }
@@ -250,7 +261,7 @@ class WordPress
                     'id' => 'edit',
                     'title' => sprintf(
                         '%1$s %2$s',
-                        __('Edit', APAPS_TEXT_DOMAIN),
+                        __('Edit', 'post-type-and-taxonomy-archive-pages'),
                         self::getArchivePagePostTypeName($postTypeArchivePageId)
                     ),
                     'href' => $editPostLink,
@@ -310,7 +321,7 @@ class WordPress
     {
         $isPage = (get_post_field('post_type', $postTypeArchivePageId) === 'page');
         if ($isPage) {
-            return __('Page', APAPS_TEXT_DOMAIN);
+            return __('Page', 'post-type-and-taxonomy-archive-pages');
         }
 
         $archivePagePostType = get_post_type($postTypeArchivePageId);

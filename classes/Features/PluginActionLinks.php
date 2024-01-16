@@ -1,6 +1,6 @@
 <?php
 
-namespace Ptapas\Features;
+namespace Ptatap\Features;
 
 defined('ABSPATH') || exit;
 
@@ -8,13 +8,13 @@ class PluginActionLinks
 {
     public function __construct()
     {
-        add_filter('plugin_action_links_' . plugin_basename(PTAPAPS_PLUGIN_FILE), [$this, 'addActionLinks']);
+        add_filter('plugin_action_links_' . plugin_basename(PTATAP_PLUGIN_FILE), [$this, 'addActionLinks']);
     }
 
     public function addActionLinks(array $links): array
     {
-        array_unshift($links, '<a href="options-permalink.php">' . __('Permalinks Settings', APAPS_TEXT_DOMAIN) . '</a>');
-        array_unshift($links, '<a href="options-reading.php">' . __('Reading Settings', APAPS_TEXT_DOMAIN) . '</a>');
+        array_unshift($links, '<a href="options-permalink.php">' . __('Permalinks Settings', 'post-type-and-taxonomy-archive-pages') . '</a>');
+        array_unshift($links, '<a href="options-reading.php">' . __('Reading Settings', 'post-type-and-taxonomy-archive-pages') . '</a>');
         return $links;
     }
 }

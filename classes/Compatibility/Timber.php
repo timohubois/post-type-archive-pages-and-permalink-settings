@@ -1,8 +1,8 @@
 <?php
 
-namespace Ptapas\Compatibility;
+namespace Ptatap\Compatibility;
 
-use Ptapas\Features\OptionsReadingPostTypes;
+use Ptatap\Features\OptionsReadingPostTypes;
 
 defined('ABSPATH') || exit;
 

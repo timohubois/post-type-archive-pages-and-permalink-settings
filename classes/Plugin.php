@@ -1,6 +1,6 @@
 <?php
 
-namespace Ptapas;
+namespace Ptatap;
 
 defined('ABSPATH') || exit;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace Ptapas\Compatibility;
+namespace Ptatap\Compatibility;
 
-use Ptapas\Features\OptionsPermalinksPostTypes;
-use Ptapas\Features\OptionsPermalinksTaxonomies;
-use Ptapas\Features\OptionsReadingPostTypes;
+use Ptatap\Features\OptionsPermalinksPostTypes;
+use Ptatap\Features\OptionsPermalinksTaxonomies;
+use Ptatap\Features\OptionsReadingPostTypes;
 use WP_Post;
 
 defined('ABSPATH') || exit;
@@ -15,7 +15,7 @@ class Wpml
     {
         if (in_array('sitepress-multilingual-cms/sitepress.php', apply_filters('active_plugins', get_option('active_plugins')))) {
             // Modifies the stored options for the post type archive pages based on the current language.
-            add_filter(APAPS_TEXT_DOMAIN . '_post_type_reading_settings', [$this, 'setTranslatedPostTypeReadingSettings'], 10, 1);
+            add_filter('ptatap_post_type_reading_settings', [$this, 'setTranslatedPostTypeReadingSettings'], 10, 1);
 
             add_filter('init', [$this, 'setPostTypeTranslationStrings'], 10);
             add_filter('init', [$this, 'setTaxonomyTranslationStrings'], 15);
@@ -170,7 +170,6 @@ class Wpml
             $pageForArchiveUris = [];
             foreach ($languages as $language) {
                 $pageForArchiveUris[] = $this->getPageForArchiveUri($postId, $language['code']);
-                ;
             }
 
             if (empty($pageForArchiveUris)) {

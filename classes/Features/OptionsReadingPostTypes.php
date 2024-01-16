@@ -1,15 +1,15 @@
 <?php
 
-namespace Ptapas\Features;
+namespace Ptatap\Features;
 
 defined('ABSPATH') || exit;
 
-use Ptapas\Features\FlushRewriteRules;
-use Ptapas\Features\SupportedPostTypes;
+use Ptatap\Features\FlushRewriteRules;
+use Ptatap\Features\SupportedPostTypes;
 
 class OptionsReadingPostTypes
 {
-    const OPTION_NAME = 'ptapaps_post_type_reading_settings';
+    const OPTION_NAME = 'ptatap_post_type_reading_settings';
 
     private static $instance = null;
     private $options = false;
@@ -32,7 +32,7 @@ class OptionsReadingPostTypes
 
     public function getOptions(): array|bool
     {
-        $this->options = apply_filters(APAPS_TEXT_DOMAIN . '_post_type_reading_settings', $this->options);
+        $this->options = apply_filters('ptatap_post_type_reading_settings', $this->options);
 
         if ($this->isOptionsEmpty($this->options)) {
             return false;
@@ -72,7 +72,7 @@ class OptionsReadingPostTypes
 
         add_settings_field(
             $optionName,
-            __('Archive Pages', APAPS_TEXT_DOMAIN),
+            __('Archive Pages', 'post-type-and-taxonomy-archive-pages'),
             [$this, 'renderSettings'],
             'reading'
         );
@@ -92,34 +92,30 @@ class OptionsReadingPostTypes
         }
 
         ?>
-        <p class="description"><?php esc_html_e('Select the page to display the archive for each post type.', APAPS_TEXT_DOMAIN); ?></p>
+        <p class="description"><?php esc_html_e('Select the page to display the archive for each post type.', 'post-type-and-taxonomy-archive-pages'); ?></p>
         <br>
         <fieldset>
             <?php foreach ($supportedPostTypes as $postType) {
-                     $optionName = self::OPTION_NAME;
-                     $selected = is_array($this->options) && $this->options[$postType->name] ? $this->options[$postType->name] : null
+                $optionName = self::OPTION_NAME;
+                $selected = is_array($this->options) && $this->options[$postType->name] ? $this->options[$postType->name] : null
                 ?>
                 <label for="<?php echo esc_attr($optionName) ?>">
                     <?php
                     printf(
                         '%1$s %2$s',
                         esc_html($postType->label),
-                        esc_html__('page:', APAPS_TEXT_DOMAIN)
+                        esc_html__('page:', 'post-type-and-taxonomy-archive-pages')
                     )
                     ?>
                     <?php
-                    printf(
-                        '%s',
-                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                        wp_dropdown_pages(
-                            [
-                                'name' => "{$optionName}[{$postType->name}]",
-                                'echo' => 0,
-                                'show_option_none' => __('&mdash; Select &mdash;'),
-                                'option_none_value' => '0',
-                                'selected' => $selected
-                            ]
-                        )
+                    wp_dropdown_pages(
+                        [
+                            'name' => esc_attr("{$optionName}[{$postType->name}]"),
+                            'echo' => 1,
+                            'show_option_none' => esc_attr__('&mdash; Select &mdash;'),
+                            'option_none_value' => '0',
+                            'selected' => esc_attr($selected)
+                        ]
                     );
                     ?>
                 </label><br>

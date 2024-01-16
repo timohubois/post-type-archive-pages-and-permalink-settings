@@ -13,6 +13,6 @@ require_once 'classes/Features/OptionsPermalinksPostTypes.php';
 require_once 'classes/Features/OptionsPermalinksTaxonomies.php';
 require_once 'classes/Features/OptionsReadingPostTypes.php';
 
-Ptapas\Features\OptionsPermalinksPostTypes::deleteOptions();
-Ptapas\Features\OptionsPermalinksTaxonomies::deleteOptions();
-Ptapas\Features\OptionsReadingPostTypes::deleteOptions();
+Ptatap\Features\OptionsPermalinksPostTypes::deleteOptions();
+Ptatap\Features\OptionsPermalinksTaxonomies::deleteOptions();
+Ptatap\Features\OptionsReadingPostTypes::deleteOptions();

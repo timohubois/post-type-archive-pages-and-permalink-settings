@@ -1,6 +1,6 @@
 <?php
 
-namespace Ptapas\Features;
+namespace Ptatap\Features;
 
 defined('ABSPATH') || exit;
 

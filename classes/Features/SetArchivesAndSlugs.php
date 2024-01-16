@@ -1,12 +1,12 @@
 <?php
 
-namespace Ptapas\Features;
+namespace Ptatap\Features;
 
 defined('ABSPATH') || exit;
 
-use Ptapas\Features\OptionsPermalinksPostTypes;
-use Ptapas\Features\OptionsPermalinksTaxonomies;
-use Ptapas\Features\OptionsReadingPostTypes;
+use Ptatap\Features\OptionsPermalinksPostTypes;
+use Ptatap\Features\OptionsPermalinksTaxonomies;
+use Ptatap\Features\OptionsReadingPostTypes;
 
 class SetArchivesAndSlugs
 {
