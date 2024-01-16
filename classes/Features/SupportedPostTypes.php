@@ -11,11 +11,7 @@ class SupportedPostTypes
 
     public function __construct()
     {
-        $this->postTypes = $this->getSupportedPostTypes();
-
-        add_action('wp_loaded', function () {
-            $this->postTypes = $this->getSupportedPostTypes();
-        });
+        add_action('wp_loaded', [$this, 'getPostTypes']);
     }
 
     public static function getInstance(): SupportedPostTypes
@@ -44,10 +40,6 @@ class SupportedPostTypes
 
     public function getPostTypes()
     {
-        if (empty($this->postTypes)) {
-            $this->postTypes = $this->getSupportedPostTypes();
-        }
-
-        return $this->postTypes;
+        return $this->postTypes = $this->postTypes ?: $this->getSupportedPostTypes();
     }
 }
