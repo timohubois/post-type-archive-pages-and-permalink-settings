@@ -13,9 +13,9 @@ class SupportedTaxonomies
     {
         $this->taxonomies = $this->getSupportedTaxonomies();
 
-        add_action('init', function () {
+        add_action('wp_loaded', function () {
             $this->taxonomies = $this->getSupportedTaxonomies();
-        }, PHP_INT_MAX);
+        });
     }
 
     public static function getInstance(): SupportedTaxonomies

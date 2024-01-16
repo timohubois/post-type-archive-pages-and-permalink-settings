@@ -16,7 +16,7 @@ class WordPress
 {
     public function __construct()
     {
-        add_action('init', [$this, 'addPostTypeRewriteRule']);
+        add_action('wp_loaded', [$this, 'addPostTypeRewriteRule'], 20);
         add_filter('rewrite_rules_array', [$this, 'updateTaxonomyRewriteRulesOrder']);
         add_action('template_redirect', [$this, 'redirectPostTypeSlugToArchivePage']);
 

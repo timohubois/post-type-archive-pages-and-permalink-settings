@@ -13,9 +13,9 @@ class SupportedPostTypes
     {
         $this->postTypes = $this->getSupportedPostTypes();
 
-        add_action('init', function () {
+        add_action('wp_loaded', function () {
             $this->postTypes = $this->getSupportedPostTypes();
-        }, PHP_INT_MAX);
+        });
     }
 
     public static function getInstance(): SupportedPostTypes
