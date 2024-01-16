@@ -34,16 +34,13 @@ class WordPress
     {
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
-        $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
 
-        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes) || empty($supportedPostTypes)) {
+        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes)) {
             return;
         }
 
-        foreach ($supportedPostTypes as $postType) {
-            $postTypeArchivePageId = $optionsReadingPostTypes[$postType->query_var] ?? null;
-
-            $postTypeSlug = $optionsPermalinksPostTypes[$postType->query_var] ?? null;
+        foreach ($optionsPermalinksPostTypes as $postType => $postTypeSlug) {
+            $postTypeArchivePageId = $optionsReadingPostTypes[$postType] ?? null;
 
             if ($postTypeArchivePageId && $postTypeSlug) {
                 add_rewrite_rule(
@@ -90,28 +87,24 @@ class WordPress
             return;
         }
 
-        $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
 
-        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes) || empty($supportedPostTypes)) {
+        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes)) {
             return;
         }
 
-        foreach ($supportedPostTypes as $postType) {
-            $postTypeArchivePage = $optionsReadingPostTypes[$postType->query_var] ?? null;
-            $postTypeSlug = $optionsPermalinksPostTypes[$postType->query_var] ?? null;
+        foreach ($optionsPermalinksPostTypes as $postType => $postTypeSlug) {
+            $postTypeArchivePageId = $optionsReadingPostTypes[$postType] ?? null;
 
-            if (!$postTypeArchivePage) {
-                continue;
-            }
-
-            if (
-                (isset($wp_query->query['name']) && $wp_query->query['name'] === $postTypeSlug && $postTypeArchivePage) ||
-                (isset($wp_query->query['pagename']) && $wp_query->query['pagename'] === $postTypeSlug && $postTypeArchivePage)
-            ) {
-                wp_redirect(get_post_type_archive_link($postType->query_var), 301);
-                exit();
+            if ($postTypeArchivePageId && $postTypeSlug) {
+                if (
+                    (isset($wp_query->query['name']) && $wp_query->query['name'] === $postTypeSlug && $postTypeArchivePageId) ||
+                    (isset($wp_query->query['pagename']) && $wp_query->query['pagename'] === $postTypeSlug && $postTypeArchivePageId)
+                ) {
+                    wp_redirect(get_post_type_archive_link($postType), 301);
+                    exit();
+                }
             }
         }
     }
@@ -274,19 +267,23 @@ class WordPress
     public function addPostStateLabel(array $postStates, WP_Post $post): array
     {
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-        $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
+        $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
 
-        if (empty($optionsReadingPostTypes) || empty($supportedPostTypes)) {
+        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes)) {
             return $postStates;
         }
 
-        foreach ($supportedPostTypes as $postType) {
-            $postTypeArchivePageId = $optionsReadingPostTypes[$postType->name] ?? null;
+        foreach ($optionsPermalinksPostTypes as $postType => $postTypeSlug) {
+            $postTypeArchivePageId = $optionsReadingPostTypes[$postType] ?? null;
 
-            if ((int)$postTypeArchivePageId && $post->ID == $postTypeArchivePageId) {
+            $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
+            $postTypeLabel = $supportedPostTypes[$postType]->labels->archives ??
+                $supportedPostTypes[$postType]->labels->name;
+
+            if ((int)$postTypeArchivePageId && (int)$post->ID === (int)$postTypeArchivePageId) {
                 $postStates[] = sprintf(
                     '%1$s',
-                    $postType->labels->archives ?? $postType->labels->name
+                    $postTypeLabel
                 );
             }
         }
