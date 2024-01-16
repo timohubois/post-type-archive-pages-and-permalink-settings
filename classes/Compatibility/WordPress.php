@@ -273,9 +273,7 @@ class WordPress
             return $postStates;
         }
 
-        foreach ($optionsPermalinksPostTypes as $postType => $postTypeSlug) {
-            $postTypeArchivePageId = $optionsReadingPostTypes[$postType] ?? null;
-
+        foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
             $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
             $postTypeLabel = $supportedPostTypes[$postType]->labels->archives ??
                 $supportedPostTypes[$postType]->labels->name;
