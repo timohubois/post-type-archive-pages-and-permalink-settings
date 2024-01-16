@@ -97,7 +97,7 @@ class OptionsReadingPostTypes
         <fieldset>
             <?php foreach ($supportedPostTypes as $postType) {
                 $optionName = self::OPTION_NAME;
-                $selected = is_array($this->options) && $this->options[$postType->name] ? $this->options[$postType->name] : null
+                $selected = is_array($this->options) && isset($this->options[$postType->name]) ? $this->options[$postType->name] : null
                 ?>
                 <label for="<?php echo esc_attr($optionName) ?>">
                     <?php
