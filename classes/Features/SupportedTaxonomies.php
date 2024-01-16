@@ -11,11 +11,7 @@ class SupportedTaxonomies
 
     public function __construct()
     {
-        $this->taxonomies = $this->getSupportedTaxonomies();
-
-        add_action('wp_loaded', function () {
-            $this->taxonomies = $this->getSupportedTaxonomies();
-        });
+        add_action('wp_loaded', [$this, 'getTaxonomies']);
     }
 
     public static function getInstance(): SupportedTaxonomies
@@ -44,10 +40,6 @@ class SupportedTaxonomies
 
     public function getTaxonomies()
     {
-        if (empty($this->taxonomies)) {
-            $this->taxonomies = $this->getSupportedTaxonomies();
-        }
-
-        return $this->taxonomies;
+        return $this->taxonomies = $this->taxonomies ?: $this->getSupportedTaxonomies();;
     }
 }
