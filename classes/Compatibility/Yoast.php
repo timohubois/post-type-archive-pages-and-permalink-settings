@@ -17,7 +17,7 @@ class Yoast
         }
     }
 
-    public function removeYoastMetaBoxOnCustomArchivePage(string $post_type, WP_Post $post): void
+    public function removeYoastMetaBoxOnCustomArchivePage(string $post_type, WP_Post $wpPost): void
     {
         if ($post_type === 'page') {
             $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
@@ -26,8 +26,8 @@ class Yoast
                 return;
             }
 
-            foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
-                if ((int)$postTypeArchivePageId === $post->ID) {
+            foreach ($optionsReadingPostTypes as $optionReadingPostType) {
+                if ((int)$optionReadingPostType === $wpPost->ID) {
                     remove_meta_box('wpseo_meta', 'page', 'normal');
                 }
             }

@@ -196,20 +196,20 @@ class WordPress
             return $sortedMenuItems;
         }
 
-        foreach ($sortedMenuItems as &$item) {
-            if ($item->type === 'post_type' && $item->object === 'page' && intval($item->object_id) === intval($postTypeArchivePageId)) {
+        foreach ($sortedMenuItems as &$sortedMenuItem) {
+            if ($sortedMenuItem->type === 'post_type' && $sortedMenuItem->object === 'page' && intval($sortedMenuItem->object_id) === intval($postTypeArchivePageId)) {
                 if (is_singular($queriedPostType) || is_tax($queriedTaxonomy)) {
-                    $item->classes[] = 'current-menu-item-ancestor';
-                    $item->current_item_ancestor = true;
-                    $sortedMenuItems = $this->recursiveAddAncestor($item, $sortedMenuItems);
+                    $sortedMenuItem->classes[] = 'current-menu-item-ancestor';
+                    $sortedMenuItem->current_item_ancestor = true;
+                    $sortedMenuItems = $this->recursiveAddAncestor($sortedMenuItem, $sortedMenuItems);
                 }
                 if (is_post_type_archive($queriedPostType)) {
-                    $item->classes[] = 'current-menu-item';
-                    $item->current = true;
-                    $sortedMenuItems = $this->recursiveAddAncestor($item, $sortedMenuItems);
+                    $sortedMenuItem->classes[] = 'current-menu-item';
+                    $sortedMenuItem->current = true;
+                    $sortedMenuItems = $this->recursiveAddAncestor($sortedMenuItem, $sortedMenuItems);
                 }
                 if (is_archive() && $queriedPostType === $wp_query->get('post_type')) {
-                    $sortedMenuItems = $this->recursiveAddAncestor($item, $sortedMenuItems);
+                    $sortedMenuItems = $this->recursiveAddAncestor($sortedMenuItem, $sortedMenuItems);
                 }
             }
         }
@@ -264,7 +264,7 @@ class WordPress
         }
     }
 
-    public function addPostStateLabel(array $postStates, WP_Post $post): array
+    public function addPostStateLabel(array $postStates, WP_Post $wpPost): array
     {
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
@@ -278,7 +278,7 @@ class WordPress
             $postTypeLabel = $supportedPostTypes[$postType]->labels->archives ??
                 $supportedPostTypes[$postType]->labels->name ?? null;
 
-            if ((int)$postTypeArchivePageId && (int)$post->ID === (int)$postTypeArchivePageId) {
+            if ((int)$postTypeArchivePageId && (int)$wpPost->ID === (int)$postTypeArchivePageId) {
                 $postStates[] = sprintf(
                     '%1$s',
                     $postTypeLabel
@@ -304,8 +304,8 @@ class WordPress
         if (empty($optionsReadingPostTypes)) {
             return;
         }
-        foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
-            if ((int)$postTypeArchivePageId === $postId) {
+        foreach ($optionsReadingPostTypes as $optionReadingPostType) {
+            if ((int)$optionReadingPostType === $postId) {
                 FlushRewriteRules::getInstance()->setup();
                 return;
             }
