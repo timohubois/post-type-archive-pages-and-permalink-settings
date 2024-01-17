@@ -66,7 +66,7 @@ class WordPress
             if ($taxonomySlug) {
                 $filteredRules = array_filter(
                     $rules,
-                    fn ($key) => strpos($key, $taxonomySlug) === 0,
+                    fn ($key) => str_starts_with($key, $taxonomySlug),
                     ARRAY_FILTER_USE_KEY
                 );
                 $nonMatchingRules = array_diff_key($rules, $filteredRules);

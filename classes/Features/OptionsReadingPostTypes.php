@@ -9,7 +9,7 @@ use Ptatap\Features\SupportedPostTypes;
 
 class OptionsReadingPostTypes
 {
-    const OPTION_NAME = 'ptatap_post_type_reading_settings';
+    public const OPTION_NAME = 'ptatap_post_type_reading_settings';
 
     private static $instance = null;
     private $options = false;

@@ -180,7 +180,7 @@ class Wpml
             $keys = array_keys($rules);
             $values = array_values($rules);
             foreach ($keys as &$key) {
-                if (strpos($key, $pageForArchiveUri) !== false || strpos($key, $postTypeObject->has_archive) !== false) {
+                if (str_contains($key, $pageForArchiveUri) || str_contains($key, $postTypeObject->has_archive)) {
                     $key = str_replace($postTypeObject->has_archive ?? $pageForArchiveUri, $replace, $key);
                 }
             }

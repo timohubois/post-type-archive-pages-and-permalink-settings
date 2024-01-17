@@ -8,7 +8,7 @@ use Ptatap\Features\SupportedPostTypes;
 
 class OptionsPermalinksPostTypes
 {
-    const OPTION_NAME = 'ptatap_post_type_permalink';
+    public const OPTION_NAME = 'ptatap_post_type_permalink';
 
     private static $instance = null;
     private $options = false;

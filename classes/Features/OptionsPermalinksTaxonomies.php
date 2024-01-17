@@ -8,7 +8,7 @@ use Ptatap\Features\SupportedTaxonomies;
 
 class OptionsPermalinksTaxonomies
 {
-    const OPTION_NAME = 'ptatap_taxonomy_permalink';
+    public const OPTION_NAME = 'ptatap_taxonomy_permalink';
 
     private static $instance = null;
     private $options = false;
