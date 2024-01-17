@@ -45,12 +45,13 @@ final class Yoast
 
         foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
             if ((int)$postTypeArchivePageId === $post->ID) {
-                $title = 'YOAST SEO meta box is disabled for this Custom Post Type archive page!';
+                $title = __('YOAST SEO meta box is disabled for this Custom Post Type archive page!', 'post-type-and-taxonomy-archive-pages');
                 $postTypeObject = get_post_type_object($postType);
 
                 $slug =  $postTypeObject->rewrite["slug"] !== '' ? $postTypeObject->rewrite["slug"] : $post->post_name;
                 $yoastSettingsPageUrl = admin_url('admin.php?page=wpseo_page_settings#/post-type/' . $slug);
                 $message = sprintf(
+                    /* translators %1$s: open <a> tag, %2$s: post type name, %3$s: close </a> tag, %4$s: open <strong> tag, %5$s: post type name, %6$s: archive, %7$s: close </strong> tag */
                     __('Change its settings on the %1$sYoast SEO > Content Types > %2$s%3$s page at the %4$s %5$s %6$s %7$s section.', 'flynt'),
                     sprintf('<a href=\'%s\' target=\'_blank\' rel=\'noopener noreferrer\'>', $yoastSettingsPageUrl),
                     $postTypeObject->labels->name,
