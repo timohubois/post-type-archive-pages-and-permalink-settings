@@ -7,7 +7,7 @@ defined('ABSPATH') || exit;
 use Ptatap\Features\FlushRewriteRules;
 use Ptatap\Features\SupportedPostTypes;
 
-class OptionsReadingPostTypes
+final class OptionsReadingPostTypes
 {
     public const OPTION_NAME = 'ptatap_post_type_reading_settings';
 

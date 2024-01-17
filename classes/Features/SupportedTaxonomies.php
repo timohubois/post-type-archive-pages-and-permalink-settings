@@ -4,7 +4,7 @@ namespace Ptatap\Features;
 
 defined('ABSPATH') || exit;
 
-class SupportedTaxonomies
+final class SupportedTaxonomies
 {
     private static ?\Ptatap\Features\SupportedTaxonomies $instance = null;
     private $taxonomies = [];

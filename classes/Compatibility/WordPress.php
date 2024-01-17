@@ -12,7 +12,7 @@ use WP_Post;
 
 defined('ABSPATH') || exit;
 
-class WordPress
+final class WordPress
 {
     public function __construct()
     {
@@ -217,7 +217,7 @@ class WordPress
         return $sortedMenuItems;
     }
 
-    protected function recursiveAddAncestor($child, $items): array
+    private function recursiveAddAncestor($child, $items): array
     {
 
         if (!intval($child->menu_item_parent)) {

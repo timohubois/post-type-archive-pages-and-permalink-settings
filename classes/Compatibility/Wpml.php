@@ -9,7 +9,7 @@ use WP_Post;
 
 defined('ABSPATH') || exit;
 
-class Wpml
+final class Wpml
 {
     public function __construct()
     {

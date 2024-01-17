@@ -6,7 +6,7 @@ use Ptatap\Features\OptionsReadingPostTypes;
 
 defined('ABSPATH') || exit;
 
-class Timber
+final class Timber
 {
     public function __construct()
     {

@@ -4,7 +4,7 @@ namespace Ptatap\Features;
 
 defined('ABSPATH') || exit;
 
-class SupportedPostTypes
+final class SupportedPostTypes
 {
     private static ?\Ptatap\Features\SupportedPostTypes $instance = null;
     private $postTypes = [];

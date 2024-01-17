@@ -8,7 +8,7 @@ use Ptatap\Features\OptionsPermalinksPostTypes;
 use Ptatap\Features\OptionsPermalinksTaxonomies;
 use Ptatap\Features\OptionsReadingPostTypes;
 
-class SetArchivesAndSlugs
+final class SetArchivesAndSlugs
 {
     public function __construct()
     {

@@ -7,7 +7,7 @@ use WP_Post;
 
 defined('ABSPATH') || exit;
 
-class Yoast
+final class Yoast
 {
     public function __construct()
     {

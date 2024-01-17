@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 use Ptatap\Features\SupportedPostTypes;
 
-class OptionsPermalinksPostTypes
+final class OptionsPermalinksPostTypes
 {
     public const OPTION_NAME = 'ptatap_post_type_permalink';
 

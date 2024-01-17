@@ -4,7 +4,7 @@ namespace Ptatap\Features;
 
 defined('ABSPATH') || exit;
 
-class FlushRewriteRules
+final class FlushRewriteRules
 {
     private string $transientName = 'ptatap_flush_rewrites';
     private static ?\Ptatap\Features\FlushRewriteRules $instance = null;

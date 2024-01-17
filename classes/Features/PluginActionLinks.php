@@ -4,7 +4,7 @@ namespace Ptatap\Features;
 
 defined('ABSPATH') || exit;
 
-class PluginActionLinks
+final class PluginActionLinks
 {
     public function __construct()
     {

@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 use Ptatap\Features\SupportedTaxonomies;
 
-class OptionsPermalinksTaxonomies
+final class OptionsPermalinksTaxonomies
 {
     public const OPTION_NAME = 'ptatap_taxonomy_permalink';
 
