@@ -7,6 +7,7 @@ defined('ABSPATH') || exit;
 final class SupportedTaxonomies
 {
     private static ?\Ptatap\Features\SupportedTaxonomies $instance = null;
+
     private $taxonomies = [];
 
     public function __construct()
@@ -19,6 +20,7 @@ final class SupportedTaxonomies
         if (!self::$instance instanceof \Ptatap\Features\SupportedTaxonomies) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 

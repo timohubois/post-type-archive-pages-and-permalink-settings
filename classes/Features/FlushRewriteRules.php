@@ -7,6 +7,7 @@ defined('ABSPATH') || exit;
 final class FlushRewriteRules
 {
     private string $transientName = 'ptatap_flush_rewrites';
+
     private static ?\Ptatap\Features\FlushRewriteRules $instance = null;
 
     public function __construct()
@@ -19,6 +20,7 @@ final class FlushRewriteRules
         if (!self::$instance instanceof \Ptatap\Features\FlushRewriteRules) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 

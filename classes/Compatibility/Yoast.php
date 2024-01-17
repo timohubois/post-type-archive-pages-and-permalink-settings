@@ -52,7 +52,7 @@ final class Yoast
                 $yoastSettingsPageUrl = admin_url('admin.php?page=wpseo_page_settings#/post-type/' . $slug);
                 $message = sprintf(
                     __('Change its settings on the %1$sYoast SEO > Content Types > %2$s%3$s page at the %4$s %5$s %6$s %7$s section.', 'flynt'),
-                    "<a href='{$yoastSettingsPageUrl}' target='_blank' rel='noopener noreferrer'>",
+                    sprintf('<a href=\'%s\' target=\'_blank\' rel=\'noopener noreferrer\'>', $yoastSettingsPageUrl),
                     $postTypeObject->labels->name,
                     "</a>",
                     "<strong>",

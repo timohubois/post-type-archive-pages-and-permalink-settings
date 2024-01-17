@@ -12,6 +12,7 @@ final class OptionsReadingPostTypes
     public const OPTION_NAME = 'ptatap_post_type_reading_settings';
 
     private static ?\Ptatap\Features\OptionsReadingPostTypes $instance = null;
+
     private $options = false;
 
     public function __construct()
@@ -27,6 +28,7 @@ final class OptionsReadingPostTypes
         if (!self::$instance instanceof \Ptatap\Features\OptionsReadingPostTypes) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
@@ -52,6 +54,7 @@ final class OptionsReadingPostTypes
                 return false;
             }
         }
+
         return true;
     }
 
@@ -110,7 +113,7 @@ final class OptionsReadingPostTypes
                     <?php
                     wp_dropdown_pages(
                         [
-                            'name' => esc_attr("{$optionName}[{$postType->name}]"),
+                            'name' => esc_attr(sprintf('%s[%s]', $optionName, $postType->name)),
                             'echo' => 1,
                             'show_option_none' => esc_attr__('&mdash; Select &mdash;'),
                             'option_none_value' => '0',
@@ -119,9 +122,10 @@ final class OptionsReadingPostTypes
                     );
                     ?>
                 </label><br>
-            <?php } ?>
+            <?php }
+         ?>
         </fieldset>
-        <?php
+<?php
     }
 
     public function maybeFlushRewriteRules(mixed $old_value, mixed $value): void

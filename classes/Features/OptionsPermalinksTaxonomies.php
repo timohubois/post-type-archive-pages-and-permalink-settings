@@ -11,6 +11,7 @@ final class OptionsPermalinksTaxonomies
     public const OPTION_NAME = 'ptatap_taxonomy_permalink';
 
     private static ?\Ptatap\Features\OptionsPermalinksTaxonomies $instance = null;
+
     private $options = false;
 
     public function __construct()
@@ -25,6 +26,7 @@ final class OptionsPermalinksTaxonomies
         if (!self::$instance instanceof \Ptatap\Features\OptionsPermalinksTaxonomies) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
@@ -48,6 +50,7 @@ final class OptionsPermalinksTaxonomies
                 return false;
             }
         }
+
         return true;
     }
 
@@ -109,6 +112,7 @@ final class OptionsPermalinksTaxonomies
         if (empty($supportedTaxonomies)) {
             return;
         }
+
         $optionName = self::OPTION_NAME;
 
         wp_nonce_field('optionsPermalinksTaxonomies_update_option', 'optionsPermalinksTaxonomies_nonce');
@@ -119,7 +123,7 @@ final class OptionsPermalinksTaxonomies
         <br>
         <fieldset>
             <?php foreach ($supportedTaxonomies as $taxonomy) {
-                $name = "{$optionName}[{$taxonomy->name}]";
+                $name = sprintf('%s[%s]', $optionName, $taxonomy->name);
                 $value = is_array($this->options) && isset($this->options[$taxonomy->name]) ? $this->options[$taxonomy->name] : '';
                 $placeholder = $taxonomy->rewrite['slug'] ?? $taxonomy->name;
                 ?>
@@ -129,8 +133,9 @@ final class OptionsPermalinksTaxonomies
                     <input type="text" name="<?php echo esc_attr($name) ?>" value="<?php echo esc_attr($value) ?>" placeholder="<?php echo esc_attr($placeholder) ?>" />
                     <code>/%taxonomyname%/</code>
                 </label><br>
-            <?php } ?>
+            <?php }
+         ?>
         </fieldset>
-        <?php
+<?php
     }
 }

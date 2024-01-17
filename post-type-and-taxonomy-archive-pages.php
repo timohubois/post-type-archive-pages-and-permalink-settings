@@ -32,17 +32,13 @@ if (file_exists(plugin_dir_path(PTATAP_PLUGIN_FILE) . 'vendor/autoload.php')) {
 if (!file_exists(plugin_dir_path(PTATAP_PLUGIN_FILE) . 'vendor/autoload.php')) {
     spl_autoload_register(function ($className): void {
         $prefix = 'Ptatap\\';
-
         $baseDir = plugin_dir_path(PTATAP_PLUGIN_FILE) . 'classes/';
-
         $length = strlen($prefix);
         if (strncmp($prefix, $className, $length) !== 0) {
             return;
         }
-
         $relativeClass = substr($className, $length);
         $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
-
         if (file_exists($file)) {
             require $file;
         }

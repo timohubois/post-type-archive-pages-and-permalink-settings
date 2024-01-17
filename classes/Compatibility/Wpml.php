@@ -69,6 +69,7 @@ final class Wpml
                 if ($wpmlUri[0] === $language['code']) {
                     array_shift($wpmlUri);
                 }
+
                 $wpmlUri = implode('/', $wpmlUri);
 
                 $translations[$postType][$language['code']] = [

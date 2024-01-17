@@ -11,6 +11,7 @@ final class OptionsPermalinksPostTypes
     public const OPTION_NAME = 'ptatap_post_type_permalink';
 
     private static ?\Ptatap\Features\OptionsPermalinksPostTypes $instance = null;
+
     private $options = false;
 
     public function __construct()
@@ -25,6 +26,7 @@ final class OptionsPermalinksPostTypes
         if (!self::$instance instanceof \Ptatap\Features\OptionsPermalinksPostTypes) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
@@ -48,6 +50,7 @@ final class OptionsPermalinksPostTypes
                 return false;
             }
         }
+
         return true;
     }
 
@@ -120,7 +123,7 @@ final class OptionsPermalinksPostTypes
         <br>
         <fieldset>
             <?php foreach ($supportedPostTypes as $post_type) {
-                $name = "{$optionName}[{$post_type->name}]";
+                $name = sprintf('%s[%s]', $optionName, $post_type->name);
                 $value = is_array($this->options) && isset($this->options[$post_type->name]) ? $this->options[$post_type->name] : '';
                 $placeholder = $post_type->rewrite['slug'] ?? $post_type->name;
                 $hasArchive = $post_type->has_archive ?? false;
@@ -145,8 +148,9 @@ final class OptionsPermalinksPostTypes
                         <?php echo esc_html($description) ?>
                     </span>
                 </label><br>
-            <?php } ?>
+            <?php }
+         ?>
         </fieldset>
-        <?php
+<?php
     }
 }

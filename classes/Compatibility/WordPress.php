@@ -66,7 +66,7 @@ final class WordPress
             if ($taxonomySlug) {
                 $filteredRules = array_filter(
                     $rules,
-                    fn ($key): bool => str_starts_with($key, $taxonomySlug),
+                    static fn($key): bool => str_starts_with($key, $taxonomySlug),
                     ARRAY_FILTER_USE_KEY
                 );
                 $nonMatchingRules = array_diff_key($rules, $filteredRules);
@@ -203,11 +203,13 @@ final class WordPress
                     $sortedMenuItem->current_item_ancestor = true;
                     $sortedMenuItems = $this->recursiveAddAncestor($sortedMenuItem, $sortedMenuItems);
                 }
+
                 if (is_post_type_archive($queriedPostType)) {
                     $sortedMenuItem->classes[] = 'current-menu-item';
                     $sortedMenuItem->current = true;
                     $sortedMenuItems = $this->recursiveAddAncestor($sortedMenuItem, $sortedMenuItems);
                 }
+
                 if (is_archive() && $queriedPostType === $wp_query->get('post_type')) {
                     $sortedMenuItems = $this->recursiveAddAncestor($sortedMenuItem, $sortedMenuItems);
                 }
@@ -231,6 +233,7 @@ final class WordPress
                 if (intval($item->menu_item_parent)) {
                     $items = $this->recursiveAddAncestor($item, $items);
                 }
+
                 break;
             }
         }
@@ -304,6 +307,7 @@ final class WordPress
         if (empty($optionsReadingPostTypes)) {
             return;
         }
+
         foreach ($optionsReadingPostTypes as $optionReadingPostType) {
             if ((int)$optionReadingPostType === $postId) {
                 FlushRewriteRules::getInstance()->setup();

@@ -7,6 +7,7 @@ defined('ABSPATH') || exit;
 final class SupportedPostTypes
 {
     private static ?\Ptatap\Features\SupportedPostTypes $instance = null;
+
     private $postTypes = [];
 
     public function __construct()
@@ -19,6 +20,7 @@ final class SupportedPostTypes
         if (!self::$instance instanceof \Ptatap\Features\SupportedPostTypes) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
