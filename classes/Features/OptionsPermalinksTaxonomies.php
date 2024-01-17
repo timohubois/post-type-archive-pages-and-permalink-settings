@@ -22,7 +22,7 @@ final class OptionsPermalinksTaxonomies
 
     public static function getInstance(): OptionsPermalinksTaxonomies
     {
-        if (self::$instance === null) {
+        if (!self::$instance instanceof \Ptatap\Features\OptionsPermalinksTaxonomies) {
             self::$instance = new self();
         }
         return self::$instance;

@@ -16,7 +16,7 @@ final class SupportedTaxonomies
 
     public static function getInstance(): SupportedTaxonomies
     {
-        if (self::$instance === null) {
+        if (!self::$instance instanceof \Ptatap\Features\SupportedTaxonomies) {
             self::$instance = new self();
         }
         return self::$instance;

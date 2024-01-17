@@ -24,7 +24,7 @@ final class OptionsReadingPostTypes
 
     public static function getInstance(): OptionsReadingPostTypes
     {
-        if (self::$instance === null) {
+        if (!self::$instance instanceof \Ptatap\Features\OptionsReadingPostTypes) {
             self::$instance = new self();
         }
         return self::$instance;

@@ -16,7 +16,7 @@ final class SupportedPostTypes
 
     public static function getInstance(): SupportedPostTypes
     {
-        if (self::$instance === null) {
+        if (!self::$instance instanceof \Ptatap\Features\SupportedPostTypes) {
             self::$instance = new self();
         }
         return self::$instance;

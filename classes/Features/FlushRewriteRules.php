@@ -16,7 +16,7 @@ final class FlushRewriteRules
 
     public static function getInstance(): FlushRewriteRules
     {
-        if (self::$instance === null) {
+        if (!self::$instance instanceof \Ptatap\Features\FlushRewriteRules) {
             self::$instance = new self();
         }
         return self::$instance;

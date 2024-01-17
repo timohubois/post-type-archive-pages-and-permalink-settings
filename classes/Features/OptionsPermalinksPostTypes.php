@@ -22,7 +22,7 @@ final class OptionsPermalinksPostTypes
 
     public static function getInstance(): OptionsPermalinksPostTypes
     {
-        if (self::$instance === null) {
+        if (!self::$instance instanceof \Ptatap\Features\OptionsPermalinksPostTypes) {
             self::$instance = new self();
         }
         return self::$instance;
