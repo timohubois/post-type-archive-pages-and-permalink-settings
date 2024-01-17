@@ -41,14 +41,17 @@ final class WordPress
 
         foreach ($optionsPermalinksPostTypes as $postType => $postTypeSlug) {
             $postTypeArchivePageId = $optionsReadingPostTypes[$postType] ?? null;
-
-            if ($postTypeArchivePageId && $postTypeSlug) {
-                add_rewrite_rule(
-                    $postTypeSlug . '/?$',
-                    'index.php?pagename=' . $postTypeSlug,
-                    'top'
-                );
+            if (!$postTypeArchivePageId) {
+                continue;
             }
+            if (!$postTypeSlug) {
+                continue;
+            }
+            add_rewrite_rule(
+                $postTypeSlug . '/?$',
+                'index.php?pagename=' . $postTypeSlug,
+                'top'
+            );
         }
     }
 
@@ -96,15 +99,18 @@ final class WordPress
 
         foreach ($optionsPermalinksPostTypes as $postType => $postTypeSlug) {
             $postTypeArchivePageId = $optionsReadingPostTypes[$postType] ?? null;
-
-            if ($postTypeArchivePageId && $postTypeSlug) {
-                if (
-                    (isset($wp_query->query['name']) && $wp_query->query['name'] === $postTypeSlug && $postTypeArchivePageId) ||
-                    (isset($wp_query->query['pagename']) && $wp_query->query['pagename'] === $postTypeSlug && $postTypeArchivePageId)
-                ) {
-                    wp_redirect(get_post_type_archive_link($postType), 301);
-                    exit();
-                }
+            if (!$postTypeArchivePageId) {
+                continue;
+            }
+            if (!$postTypeSlug) {
+                continue;
+            }
+            if (
+                (isset($wp_query->query['name']) && $wp_query->query['name'] === $postTypeSlug && $postTypeArchivePageId) ||
+                (isset($wp_query->query['pagename']) && $wp_query->query['pagename'] === $postTypeSlug && $postTypeArchivePageId)
+            ) {
+                wp_redirect(get_post_type_archive_link($postType), 301);
+                exit();
             }
         }
     }
@@ -120,7 +126,7 @@ final class WordPress
         }
 
         if (is_tax()) {
-            $title = self::updateTaxonomyTitle($title);
+            return self::updateTaxonomyTitle($title);
         }
 
         return $title;
@@ -280,13 +286,16 @@ final class WordPress
             $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
             $postTypeLabel = $supportedPostTypes[$postType]->labels->archives ??
                 $supportedPostTypes[$postType]->labels->name ?? null;
-
-            if ((int)$postTypeArchivePageId && (int)$wpPost->ID === (int)$postTypeArchivePageId) {
-                $postStates[] = sprintf(
-                    '%1$s',
-                    $postTypeLabel
-                );
+            if (!(int)$postTypeArchivePageId) {
+                continue;
             }
+            if ((int)$wpPost->ID !== (int)$postTypeArchivePageId) {
+                continue;
+            }
+            $postStates[] = sprintf(
+                '%1$s',
+                $postTypeLabel
+            );
         }
 
         return $postStates;
@@ -324,10 +333,12 @@ final class WordPress
         }
 
         $archivePagePostType = get_post_type($postTypeArchivePageId);
-        if (is_object($archivePagePostType) && isset($archivePagePostType->labels->name)) {
-            return $archivePagePostType->labels->name;
+        if (!is_object($archivePagePostType)) {
+            return '';
         }
-
-        return '';
+        if (!isset($archivePagePostType->labels->name)) {
+            return '';
+        }
+        return $archivePagePostType->labels->name;
     }
 }

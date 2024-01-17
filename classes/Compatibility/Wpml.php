@@ -113,16 +113,20 @@ final class Wpml
                     $name,
                     $languageCode
                 );
-                if ($translatedString === $defaultLanguagePermalink && $hasPermalink) {
-                    do_action(
-                        'wpml_register_single_string',
-                        'WordPress',
-                        $name,
-                        $targetLanguageString,
-                        true,
-                        $languageCode
-                    );
+                if ($translatedString !== $defaultLanguagePermalink) {
+                    continue;
                 }
+                if (!$hasPermalink) {
+                    continue;
+                }
+                do_action(
+                    'wpml_register_single_string',
+                    'WordPress',
+                    $name,
+                    $targetLanguageString,
+                    true,
+                    $languageCode
+                );
             }
         }
     }
@@ -163,8 +167,10 @@ final class Wpml
         foreach ($optionsReadingPostTypes as $postType => $postId) {
             $pageForArchiveUri = $this->getPageForArchiveUri($postId, $defaultLanguageCode);
             $postTypeObject = get_post_type_object($postType);
-
-            if (empty($pageForArchiveUri) || empty($postTypeObject)) {
+            if (empty($pageForArchiveUri)) {
+                continue;
+            }
+            if (empty($postTypeObject)) {
                 continue;
             }
 
