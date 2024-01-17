@@ -30,7 +30,7 @@ if (file_exists(plugin_dir_path(PTATAP_PLUGIN_FILE) . 'vendor/autoload.php')) {
 
 // Custom autoloader if Composer is not available.
 if (!file_exists(plugin_dir_path(PTATAP_PLUGIN_FILE) . 'vendor/autoload.php')) {
-    spl_autoload_register(function ($className): void {
+    spl_autoload_register(static function ($className) : void {
         $prefix = 'Ptatap\\';
         $baseDir = plugin_dir_path(PTATAP_PLUGIN_FILE) . 'classes/';
         $length = strlen($prefix);
