@@ -10,7 +10,7 @@ class OptionsPermalinksPostTypes
 {
     public const OPTION_NAME = 'ptatap_post_type_permalink';
 
-    private static $instance = null;
+    private static ?\Ptatap\Features\OptionsPermalinksPostTypes $instance = null;
     private $options = false;
 
     public function __construct()

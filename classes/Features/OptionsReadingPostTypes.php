@@ -11,7 +11,7 @@ class OptionsReadingPostTypes
 {
     public const OPTION_NAME = 'ptatap_post_type_reading_settings';
 
-    private static $instance = null;
+    private static ?\Ptatap\Features\OptionsReadingPostTypes $instance = null;
     private $options = false;
 
     public function __construct()

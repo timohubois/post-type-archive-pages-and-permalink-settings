@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 class SupportedTaxonomies
 {
-    private static $instance = null;
+    private static ?\Ptatap\Features\SupportedTaxonomies $instance = null;
     private $taxonomies = [];
 
     public function __construct()

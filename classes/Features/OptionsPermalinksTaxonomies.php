@@ -10,7 +10,7 @@ class OptionsPermalinksTaxonomies
 {
     public const OPTION_NAME = 'ptatap_taxonomy_permalink';
 
-    private static $instance = null;
+    private static ?\Ptatap\Features\OptionsPermalinksTaxonomies $instance = null;
     private $options = false;
 
     public function __construct()

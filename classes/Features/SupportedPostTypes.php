@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 class SupportedPostTypes
 {
-    private static $instance = null;
+    private static ?\Ptatap\Features\SupportedPostTypes $instance = null;
     private $postTypes = [];
 
     public function __construct()

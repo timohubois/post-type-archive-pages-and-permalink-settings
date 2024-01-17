@@ -30,7 +30,7 @@ class Wpml
         }
     }
 
-    public function setTranslatedPostTypeReadingSettings($postTypeReadingSettings): array|bool
+    public function setTranslatedPostTypeReadingSettings(array $postTypeReadingSettings): array|bool
     {
         if (!$postTypeReadingSettings) {
             return $postTypeReadingSettings;
