@@ -149,8 +149,8 @@ final class OptionsPermalinksPostTypes
                     </span>
                 </label><br>
             <?php }
-         ?>
+            ?>
         </fieldset>
-<?php
+        <?php
     }
 }

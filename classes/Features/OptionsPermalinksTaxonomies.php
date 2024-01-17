@@ -134,8 +134,8 @@ final class OptionsPermalinksTaxonomies
                     <code>/%taxonomyname%/</code>
                 </label><br>
             <?php }
-         ?>
+            ?>
         </fieldset>
-<?php
+        <?php
     }
 }

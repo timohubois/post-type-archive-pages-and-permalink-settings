@@ -123,9 +123,9 @@ final class OptionsReadingPostTypes
                     ?>
                 </label><br>
             <?php }
-         ?>
+            ?>
         </fieldset>
-<?php
+        <?php
     }
 
     public function maybeFlushRewriteRules(mixed $old_value, mixed $value): void
