@@ -32,7 +32,7 @@ final class Wpml
 
     public function setTranslatedPostTypeReadingSettings(array $postTypeReadingSettings): array|bool
     {
-        if (!$postTypeReadingSettings) {
+        if ($postTypeReadingSettings === []) {
             return $postTypeReadingSettings;
         }
 
@@ -51,7 +51,7 @@ final class Wpml
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
         $languages = apply_filters('wpml_active_languages', [], 'skip_missing=0');
 
-        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes) || empty($languages)) {
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false || ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === []) || empty($languages)) {
             return;
         }
 
@@ -116,9 +116,11 @@ final class Wpml
                 if ($translatedString !== $defaultLanguagePermalink) {
                     continue;
                 }
+
                 if (!$hasPermalink) {
                     continue;
                 }
+
                 do_action(
                     'wpml_register_single_string',
                     'WordPress',
@@ -137,7 +139,7 @@ final class Wpml
         $languages = apply_filters('wpml_active_languages', [], 'skip_missing=0');
         $defaultLanguageCode = apply_filters('wpml_default_language', null);
 
-        if (empty($optionsPermalinksTaxonomies) || empty($languages) || empty($defaultLanguageCode)) {
+        if ($optionsPermalinksTaxonomies === [] || $optionsPermalinksTaxonomies === false || empty($languages) || empty($defaultLanguageCode)) {
             return;
         }
 
@@ -159,7 +161,7 @@ final class Wpml
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
         $languages = apply_filters('wpml_active_languages', [], 'skip_missing=0');
 
-        if (empty($optionsReadingPostTypes) || empty($languages)) {
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false || empty($languages)) {
             return $rules;
         }
 
@@ -167,9 +169,14 @@ final class Wpml
         foreach ($optionsReadingPostTypes as $postType => $postId) {
             $pageForArchiveUri = $this->getPageForArchiveUri($postId, $defaultLanguageCode);
             $postTypeObject = get_post_type_object($postType);
-            if (empty($pageForArchiveUri)) {
+            if ($pageForArchiveUri === '') {
                 continue;
             }
+
+            if ($pageForArchiveUri === '0') {
+                continue;
+            }
+
             if (empty($postTypeObject)) {
                 continue;
             }
@@ -179,7 +186,7 @@ final class Wpml
                 $pageForArchiveUris[] = $this->getPageForArchiveUri($postId, $language['code']);
             }
 
-            if (empty($pageForArchiveUris)) {
+            if ($pageForArchiveUris === []) {
                 continue;
             }
 
@@ -203,7 +210,7 @@ final class Wpml
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
         $postType = get_post_field('post_type', $wpPost);
 
-        if (empty($optionsPermalinksPostTypes) || $optionsPermalinksPostTypes[$postType]) {
+        if ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === [] || $optionsPermalinksPostTypes[$postType]) {
             return $postLink;
         }
 
@@ -225,7 +232,7 @@ final class Wpml
         $pageForArchiveId = $optionsReadingPostTypes[$post_type] ?? null;
         $currentLanguage = apply_filters('wpml_current_language', null);
 
-        if (empty($optionsReadingPostTypes) || empty($currentLanguage) || empty($currentLanguage)) {
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false || empty($currentLanguage) || empty($currentLanguage)) {
             return $link;
         }
 
@@ -237,7 +244,7 @@ final class Wpml
     {
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
-        if (empty($optionsReadingPostTypes)) {
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
             return $url;
         }
 
@@ -258,7 +265,7 @@ final class Wpml
     {
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
-        if (empty($optionsReadingPostTypes)) {
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
             return $url;
         }
 
@@ -283,7 +290,7 @@ final class Wpml
 
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
-        if (empty($optionsReadingPostTypes)) {
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
             return $languages;
         }
 
@@ -352,7 +359,7 @@ final class Wpml
 
     private function getWpmlObjectId(string|int|null|bool $postId = 0, string|null $object = null, string|null $language = null): string|int|null
     {
-        if (empty($object)) {
+        if ($object === null || $object === '' || $object === '0') {
             $isPage = (get_post_field('post_type', $postId) === 'page');
             if ($isPage) {
                 $object = get_post_type($postId);

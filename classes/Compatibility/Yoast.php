@@ -22,7 +22,7 @@ final class Yoast
         if ($post_type === 'page') {
             $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
-            if (empty($optionsReadingPostTypes)) {
+            if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
                 return;
             }
 
@@ -39,7 +39,7 @@ final class Yoast
         global $post;
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
-        if (empty($optionsReadingPostTypes)) {
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
             return;
         }
 
@@ -53,7 +53,7 @@ final class Yoast
                 $message = sprintf(
                     /* translators %1$s: open <a> tag, %2$s: post type name, %3$s: close </a> tag, %4$s: open <strong> tag, %5$s: post type name, %6$s: archive, %7$s: close </strong> tag */
                     __('Change its settings on the %1$sYoast SEO > Content Types > %2$s%3$s page at the %4$s %5$s %6$s %7$s section.', 'flynt'),
-                    sprintf('<a href=\'%s\' target=\'_blank\' rel=\'noopener noreferrer\'>', $yoastSettingsPageUrl),
+                    sprintf("<a href='%s' target='_blank' rel='noopener noreferrer'>", $yoastSettingsPageUrl),
                     $postTypeObject->labels->name,
                     "</a>",
                     "<strong>",

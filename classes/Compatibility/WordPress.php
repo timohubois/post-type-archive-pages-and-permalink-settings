@@ -35,7 +35,7 @@ final class WordPress
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
 
-        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes)) {
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false || ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === [])) {
             return;
         }
 
@@ -44,9 +44,11 @@ final class WordPress
             if (!$postTypeArchivePageId) {
                 continue;
             }
+
             if (!$postTypeSlug) {
                 continue;
             }
+
             add_rewrite_rule(
                 $postTypeSlug . '/?$',
                 'index.php?pagename=' . $postTypeSlug,
@@ -59,7 +61,7 @@ final class WordPress
     {
         $optionsPermalinksTaxonomies = OptionsPermalinksTaxonomies::getInstance()->getOptions();
 
-        if (empty($optionsPermalinksTaxonomies)) {
+        if ($optionsPermalinksTaxonomies === [] || $optionsPermalinksTaxonomies === false) {
             return $rules;
         }
 
@@ -93,7 +95,7 @@ final class WordPress
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
 
-        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes)) {
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false || ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === [])) {
             return;
         }
 
@@ -102,9 +104,11 @@ final class WordPress
             if (!$postTypeArchivePageId) {
                 continue;
             }
+
             if (!$postTypeSlug) {
                 continue;
             }
+
             if (
                 (isset($wp_query->query['name']) && $wp_query->query['name'] === $postTypeSlug && $postTypeArchivePageId) ||
                 (isset($wp_query->query['pagename']) && $wp_query->query['pagename'] === $postTypeSlug && $postTypeArchivePageId)
@@ -203,7 +207,7 @@ final class WordPress
         }
 
         foreach ($sortedMenuItems as &$sortedMenuItem) {
-            if ($sortedMenuItem->type === 'post_type' && $sortedMenuItem->object === 'page' && intval($sortedMenuItem->object_id) === intval($postTypeArchivePageId)) {
+            if ($sortedMenuItem->type === 'post_type' && $sortedMenuItem->object === 'page' && (int) $sortedMenuItem->object_id === (int) $postTypeArchivePageId) {
                 if (is_singular($queriedPostType) || is_tax($queriedTaxonomy)) {
                     $sortedMenuItem->classes[] = 'current-menu-item-ancestor';
                     $sortedMenuItem->current_item_ancestor = true;
@@ -228,15 +232,15 @@ final class WordPress
     private function recursiveAddAncestor($child, $items): array
     {
 
-        if (!intval($child->menu_item_parent)) {
+        if ((int) $child->menu_item_parent === 0) {
             return $items;
         }
 
         foreach ($items as $item) {
-            if (intval($item->ID) === intval($child->menu_item_parent)) {
+            if ((int) $item->ID === (int) $child->menu_item_parent) {
                 $item->classes[] = 'current-menu-item-ancestor';
                 $item->current_item_ancestor = true;
-                if (intval($item->menu_item_parent)) {
+                if ((int) $item->menu_item_parent !== 0) {
                     $items = $this->recursiveAddAncestor($item, $items);
                 }
 
@@ -278,7 +282,7 @@ final class WordPress
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
 
-        if (empty($optionsReadingPostTypes) || empty($optionsPermalinksPostTypes)) {
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false || ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === [])) {
             return $postStates;
         }
 
@@ -286,12 +290,14 @@ final class WordPress
             $supportedPostTypes = SupportedPostTypes::getInstance()->getPostTypes();
             $postTypeLabel = $supportedPostTypes[$postType]->labels->archives ??
                 $supportedPostTypes[$postType]->labels->name ?? null;
-            if (!(int)$postTypeArchivePageId) {
+            if ((int)$postTypeArchivePageId === 0) {
                 continue;
             }
+
             if ((int)$wpPost->ID !== (int)$postTypeArchivePageId) {
                 continue;
             }
+
             $postStates[] = sprintf(
                 '%1$s',
                 $postTypeLabel
@@ -313,7 +319,7 @@ final class WordPress
         }
 
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-        if (empty($optionsReadingPostTypes)) {
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
             return;
         }
 
@@ -336,9 +342,11 @@ final class WordPress
         if (!is_object($archivePagePostType)) {
             return '';
         }
+
         if (!isset($archivePagePostType->labels->name)) {
             return '';
         }
+
         return $archivePagePostType->labels->name;
     }
 }

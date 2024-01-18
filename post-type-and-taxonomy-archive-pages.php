@@ -37,6 +37,7 @@ if (!file_exists(plugin_dir_path(PTATAP_PLUGIN_FILE) . 'vendor/autoload.php')) {
         if (strncmp($prefix, $className, $length) !== 0) {
             return;
         }
+
         $relativeClass = substr($className, $length);
         $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
         if (file_exists($file)) {
