@@ -1,6 +1,6 @@
 === Post Type and Taxonomy Archive Pages ===
 Contributors: timohubois
-Tags: flynt, components
+Tags: Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.0
 Tested up to: 6.4
 Stable tag: 1.0
@@ -28,7 +28,7 @@ Check out the Plugin [GitHub Repository](https://github.com/timohubois/archive-p
 (recommended)
 
 1. Open **Plugins > Add new**
-2. Search for **Components Overview for Flynt**
+2. Search for **Post Type and Taxonomy Archive Pages**
 3. Click **install and activate** the plugin
 
 = INSTALL MANUALLY THROUGH FTP =
