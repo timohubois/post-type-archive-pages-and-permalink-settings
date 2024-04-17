@@ -2,8 +2,8 @@
 Contributors: timohubois
 Tags: Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.0
-Tested up to: 6.4
-Stable tag: 1.0
+Tested up to: 6.5
+Stable tag: 1.1
 Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -38,5 +38,9 @@ Check out the Plugin [GitHub Repository](https://github.com/timohubois/archive-p
 3. Activate the plugin through the ‘Plugins’ menu in WordPress
 
 == Changelog ==
+
+= 1.1 =
+* Fixed an issue at activation in combination with wpml
+
 = 1.0 =
 * Initial Release
