@@ -94,6 +94,10 @@ final class OptionsReadingPostTypes
             return;
         }
 
+        usort($supportedPostTypes, function ($a, $b) {
+            return strcmp($a->name, $b->name);
+        });
+
         ?>
         <p class="description"><?php esc_html_e('Select the page to display the archive for each post type.', 'post-type-and-taxonomy-archive-pages'); ?></p>
         <br>

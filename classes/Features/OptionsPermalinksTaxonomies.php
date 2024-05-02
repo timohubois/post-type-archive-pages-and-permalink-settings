@@ -113,6 +113,10 @@ final class OptionsPermalinksTaxonomies
             return;
         }
 
+        usort($supportedTaxonomies, function ($a, $b) {
+            return strcmp($a->name, $b->name);
+        });
+
         $optionName = self::OPTION_NAME;
 
         wp_nonce_field('optionsPermalinksTaxonomies_update_option', 'optionsPermalinksTaxonomies_nonce');
