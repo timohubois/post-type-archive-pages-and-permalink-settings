@@ -280,9 +280,8 @@ final class WordPress
     public function addPostStateLabel(array $postStates, WP_Post $wpPost): array
     {
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-        $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
 
-        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false || ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === [])) {
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
             return $postStates;
         }
 
