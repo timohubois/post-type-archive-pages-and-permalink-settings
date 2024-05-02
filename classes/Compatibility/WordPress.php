@@ -49,6 +49,11 @@ final class WordPress
                 continue;
             }
 
+            $postTypeArchivePageSlug = get_post_field('post_name', $postTypeArchivePageId);
+            if ($postTypeArchivePageSlug === $postTypeSlug) {
+                continue;
+            }
+
             add_rewrite_rule(
                 $postTypeSlug . '/?$',
                 'index.php?pagename=' . $postTypeSlug,
