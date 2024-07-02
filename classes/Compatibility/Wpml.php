@@ -27,6 +27,8 @@ final class Wpml
             add_filter('icl_ls_languages', [$this, 'setIcLsLanguages'], 10, 1);
             add_filter('wpml_ls_language_url', [$this, 'setWpmlLsLanguageUrls'], 10, 2);
             add_filter('wpml_alternate_hreflang', [$this, 'setWpmlAlternateHrefLang'], 10, 2);
+
+            add_action('template_redirect', [$this, 'redirectTo404IfArchivePageNotFoundInCurrentLanguage'], 10);
         }
     }
 
@@ -39,7 +41,8 @@ final class Wpml
         $currentLanguage = isset($_GET['lang']) ? sanitize_text_field(wp_unslash($_GET['lang'])) : apply_filters('wpml_current_language', null);
 
         foreach ($postTypeReadingSettings as $postType => $value) {
-            $postTypeReadingSettings[$postType] = $this->getWpmlObjectId($value, $postType, $currentLanguage);
+            $returnOriginalIfMissing = true;
+            $postTypeReadingSettings[$postType] = $this->getWpmlObjectId($value, $postType, $returnOriginalIfMissing, $currentLanguage);
         }
 
         return $postTypeReadingSettings;
@@ -60,7 +63,8 @@ final class Wpml
         $translations = [];
         foreach ($optionsReadingPostTypes as $postType => $postId) {
             foreach ($languages as $language) {
-                $wpmlObjectId = $this->getWpmlObjectId($postId, null, $language['code']);
+                $returnOriginalIfMissing = true;
+                $wpmlObjectId = $this->getWpmlObjectId($postId, null, $returnOriginalIfMissing, $language['code']);
                 $pageUri = get_page_uri($wpmlObjectId);
                 $wpmlPermalink = apply_filters('wpml_permalink', home_url($pageUri), $language['code']);
                 $wpmlUri = trim(wp_make_link_relative($wpmlPermalink), '/');
@@ -253,7 +257,8 @@ final class Wpml
                 continue;
             }
 
-            $wpmlObjectId = $this->getWpmlObjectId($postId, $postType, $langs['code']);
+            $returnOriginalIfMissing = false;
+            $wpmlObjectId = $this->getWpmlObjectId($postId, $postType, $returnOriginalIfMissing, $langs['code']);
             $pageUri = get_page_uri($wpmlObjectId);
             return apply_filters('wpml_permalink', home_url($pageUri), $langs['code']);
         }
@@ -263,6 +268,7 @@ final class Wpml
 
     public function setWpmlAlternateHrefLang(string $url, string $code): string
     {
+
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
         if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
@@ -274,7 +280,8 @@ final class Wpml
                 continue;
             }
 
-            $wpmlObjectId = $this->getWpmlObjectId($postId, $postType, $code);
+            $returnOriginalIfMissing = false;
+            $wpmlObjectId = $this->getWpmlObjectId($postId, $postType, $returnOriginalIfMissing, $code);
             $pageUri = get_page_uri($wpmlObjectId);
             return apply_filters('wpml_permalink', home_url($pageUri), $code);
         }
@@ -286,6 +293,10 @@ final class Wpml
     {
         if (is_admin()) {
             return $languages;
+        }
+
+        if (is_404()) {
+            return [];
         }
 
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
@@ -332,7 +343,8 @@ final class Wpml
             }
 
             foreach ($languages as $key => $language) {
-                $wpmlObjectId = $this->getWpmlObjectId($postId, $postType, $language['code']);
+                $returnOriginalIfMissing = false;
+                $wpmlObjectId = $this->getWpmlObjectId($postId, $postType, $returnOriginalIfMissing, $language['code']);
                 $pageUri = get_page_uri($wpmlObjectId);
                 $languages[$key]['url'] = apply_filters('wpml_permalink', home_url($pageUri), $language['code']);
             }
@@ -341,10 +353,45 @@ final class Wpml
         return $languages;
     }
 
+    public function redirectTo404IfArchivePageNotFoundInCurrentLanguage(): void
+    {
+
+        global $wp_query;
+        $queriedPostType = $wp_query->query_vars['post_type'];
+
+        $isPostTypeArchive = is_post_type_archive($queriedPostType);
+        if (!$isPostTypeArchive) {
+            return;
+        }
+
+        $supportedPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+        if ($supportedPostTypes === [] || $supportedPostTypes === false) {
+            return;
+        }
+
+        $pageForArchiveId = $supportedPostTypes[$queriedPostType] ?? null;
+        if (!$pageForArchiveId) {
+            return;
+        }
+
+        $currentLanguage = apply_filters('wpml_current_language', null);
+        $returnOriginalIfMissing = false;
+        $getWpmlObjectId = $this->getWpmlObjectId($pageForArchiveId, $queriedPostType, $returnOriginalIfMissing, $currentLanguage);
+
+        if ($getWpmlObjectId) {
+            return;
+        }
+
+        $wp_query->set_404();
+        status_header(404);
+        nocache_headers();
+    }
+
     private function getPageForArchiveUri(string|int|null|bool $pageForArchiveId = null, string|null $languageCode = null): string
     {
 
-        $wpmlObjectId = $this->getWpmlObjectId($pageForArchiveId, null, $languageCode);
+        $returnOriginalIfMissing = false;
+        $wpmlObjectId = $this->getWpmlObjectId($pageForArchiveId, null, $returnOriginalIfMissing, $languageCode);
         $pageUri = get_page_uri($wpmlObjectId);
         $wpmlPermalink = apply_filters('wpml_permalink', home_url($pageUri), $languageCode);
         $wpmlUri = trim(wp_make_link_relative($wpmlPermalink), '/');
@@ -357,7 +404,7 @@ final class Wpml
         return implode('/', $wpmlUri);
     }
 
-    private function getWpmlObjectId(string|int|null|bool $postId = 0, string|null $object = null, string|null $language = null): string|int|null
+    private function getWpmlObjectId(string|int|null|bool $postId = 0, string|null $object = null, bool $returnOriginalIfMissing = false, string|null $language = null): string|int|null
     {
         if ($object === null || $object === '' || $object === '0') {
             $isPage = (get_post_field('post_type', $postId) === 'page');
@@ -368,6 +415,6 @@ final class Wpml
             $object = get_post_type($postId) ?: null;
         }
 
-        return apply_filters('wpml_object_id', $postId, $object, true, $language);
+        return apply_filters('wpml_object_id', $postId, $object, $returnOriginalIfMissing, $language);
     }
 }
