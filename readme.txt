@@ -20,7 +20,7 @@ The Plugin extends the native **Reading** and **Permalinks** settings pages:
 * Settings > **Permalinks** > Adds a section to change the slug for custom post types and custom taxonomies.
 
 == Want to contribute? ==
-Check out the Plugin [GitHub Repository](https://github.com/timohubois/archive-pages-and-permalink-settings-for-post-types-and-taxonomies/).
+Check out the Plugin [GitHub Repository](https://github.com/timohubois/post-type-and-taxonomy-archive-pages/).
 
 == Installation ==
 
