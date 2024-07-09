@@ -93,7 +93,7 @@ final class OptionsPermalinksTaxonomies
 
         add_settings_field(
             self::OPTION_NAME,
-            __('Custom Taxonomies', 'post-type-and-taxonomy-archive-pages'),
+            __('Custom Taxonomies', 'post-type-archive-pages-and-permalink-settings'),
             [$this, 'renderOptionsSettingsField'],
             'permalink',
             'optional'
@@ -122,7 +122,7 @@ final class OptionsPermalinksTaxonomies
         wp_nonce_field('optionsPermalinksTaxonomies_update_option', 'optionsPermalinksTaxonomies_nonce');
         ?>
         <p class="description">
-            <strong><?php esc_html_e('Notice: Tags are not tested nor supported!', 'post-type-and-taxonomy-archive-pages'); ?></strong>
+            <strong><?php esc_html_e('Notice: Tags are not tested nor supported!', 'post-type-archive-pages-and-permalink-settings'); ?></strong>
         </p>
         <br>
         <fieldset>
@@ -132,7 +132,7 @@ final class OptionsPermalinksTaxonomies
                 $placeholder = $taxonomy->rewrite['slug'] ?? $taxonomy->name;
                 ?>
                 <label for="<?php echo esc_attr($optionName) ?>">
-                    <strong><?php echo esc_html($taxonomy->label); ?> <?php esc_html_e('base', 'post-type-and-taxonomy-archive-pages') ?> </strong><br>
+                    <strong><?php echo esc_html($taxonomy->label); ?> <?php esc_html_e('base', 'post-type-archive-pages-and-permalink-settings') ?> </strong><br>
                     <code><?php echo esc_url(home_url()) . '/'; ?></code>
                     <input type="text" name="<?php echo esc_attr($name) ?>" value="<?php echo esc_attr($value) ?>" placeholder="<?php echo esc_attr($placeholder) ?>" />
                     <code>/%taxonomyname%/</code>

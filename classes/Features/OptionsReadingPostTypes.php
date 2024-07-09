@@ -75,7 +75,7 @@ final class OptionsReadingPostTypes
 
         add_settings_field(
             $optionName,
-            __('Archive Pages', 'post-type-and-taxonomy-archive-pages'),
+            __('Archive Pages', 'post-type-archive-pages-and-permalink-settings'),
             [$this, 'renderSettings'],
             'reading'
         );
@@ -99,7 +99,7 @@ final class OptionsReadingPostTypes
         });
 
         ?>
-        <p class="description"><?php esc_html_e('Select the page to display the archive for each post type.', 'post-type-and-taxonomy-archive-pages'); ?></p>
+        <p class="description"><?php esc_html_e('Select the page to display the archive for each post type.', 'post-type-archive-pages-and-permalink-settings'); ?></p>
         <br>
         <fieldset>
             <?php foreach ($supportedPostTypes as $postType) {
@@ -111,7 +111,7 @@ final class OptionsReadingPostTypes
                     printf(
                         '%1$s %2$s',
                         esc_html($postType->label),
-                        esc_html__('page:', 'post-type-and-taxonomy-archive-pages')
+                        esc_html__('page:', 'post-type-archive-pages-and-permalink-settings')
                     )
                     ?>
                     <?php

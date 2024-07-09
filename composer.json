@@ -1,5 +1,5 @@
 {
-    "name": "timohubois/post-type-and-taxonomy-archive-pages",
+    "name": "timohubois/post-type-archive-pages-and-permalink-settings",
     "description": "Set the archive for your custom post types to associate them with a specific page and control the permalinks for single custom post type pages and custom taxonomies.",
     "type": "wordpress-plugin",
     "license": "GPL-3.0-or-later",

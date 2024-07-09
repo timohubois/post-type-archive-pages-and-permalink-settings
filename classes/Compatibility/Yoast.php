@@ -45,7 +45,7 @@ final class Yoast
 
         foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
             if ((int)$postTypeArchivePageId === $post->ID) {
-                $title = __('YOAST SEO meta box is disabled for this Custom Post Type archive page!', 'post-type-and-taxonomy-archive-pages');
+                $title = __('YOAST SEO meta box is disabled for this Custom Post Type archive page!', 'post-type-archive-pages-and-permalink-settings');
                 $postTypeObject = get_post_type_object($postType);
 
                 $slug =  $postTypeObject->rewrite["slug"] !== '' ? $postTypeObject->rewrite["slug"] : $post->post_name;
@@ -58,7 +58,7 @@ final class Yoast
                     "</a>",
                     "<strong>",
                     $postTypeObject->labels->name,
-                    __(" archive", 'post-type-and-taxonomy-archive-pages'),
+                    __(" archive", 'post-type-archive-pages-and-permalink-settings'),
                     "</strong>"
                 );
 

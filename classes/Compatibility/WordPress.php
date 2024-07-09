@@ -272,7 +272,7 @@ final class WordPress
                     'id' => 'edit',
                     'title' => sprintf(
                         '%1$s %2$s',
-                        __('Edit', 'post-type-and-taxonomy-archive-pages'),
+                        __('Edit', 'post-type-archive-pages-and-permalink-settings'),
                         self::getArchivePagePostTypeName($postTypeArchivePageId)
                     ),
                     'href' => $editPostLink,
@@ -343,7 +343,7 @@ final class WordPress
     {
         $isPage = (get_post_field('post_type', $postTypeArchivePageId) === 'page');
         if ($isPage) {
-            return __('Page', 'post-type-and-taxonomy-archive-pages');
+            return __('Page', 'post-type-archive-pages-and-permalink-settings');
         }
 
         $archivePagePostType = get_post_type($postTypeArchivePageId);

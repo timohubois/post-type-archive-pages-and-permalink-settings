@@ -1,20 +1,23 @@
 <?php
 
 /**
- * Plugin Name:       Post Type and Taxonomy Archive Pages and Permalink Settings
- * Plugin URI:        https://github.com/timohubois/post-type-and-taxonomy-archive-pages/
+ * Plugin Name:       Post Type Archive Pages and Permalink Settings
+ * Plugin URI:        https://github.com/timohubois/post-type-archive-pages-and-permalink-settings/
  * Description:       Set the archive for your custom post types to display it on a specific page and control the permalinks of custom post type single pages and custom taxonomies.
  * Version:           1.4
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            Timo Hubois
  * Author URI:        https://pixelsaft.wtf
- * Text Domain:       post-type-and-taxonomy-archive-pages
+ * Text Domain:       post-type-archive-pages-and-permalink-settings
  * Domain Path:       /languages
  * License:           GPLv3 or later
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  */
 
+ /**
+ * Ptatap: Acronym for Post Type Archive and Permalink Settings
+ */
 namespace Ptatap;
 
 defined('ABSPATH') || exit;

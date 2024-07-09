@@ -13,8 +13,8 @@ final class PluginActionLinks
 
     public function addActionLinks(array $links): array
     {
-        array_unshift($links, '<a href="options-permalink.php">' . __('Permalinks Settings', 'post-type-and-taxonomy-archive-pages') . '</a>');
-        array_unshift($links, '<a href="options-reading.php">' . __('Reading Settings', 'post-type-and-taxonomy-archive-pages') . '</a>');
+        array_unshift($links, '<a href="options-permalink.php">' . __('Permalinks Settings', 'post-type-archive-pages-and-permalink-settings') . '</a>');
+        array_unshift($links, '<a href="options-reading.php">' . __('Reading Settings', 'post-type-archive-pages-and-permalink-settings') . '</a>');
         return $links;
     }
 }
