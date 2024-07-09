@@ -1,6 +1,6 @@
-# Post Type and Taxonomy Archive Pages
+# Post Type and Taxonomy Archive Pages Settings
 
-Post Type and Taxonomy Archive Pages enables to select a page that should interact as archive for custom post types. It also enables to change the slug for custom post type single pages or custom taxonomies.
+Post Type and Taxonomy Archive Pages Settings enables to select a page that should interact as archive for custom post types. It also enables to change the slug for custom post type single pages or custom taxonomies.
 
 The Plugin extends the native **Reading** and **Permalinks** settings pages:
 
