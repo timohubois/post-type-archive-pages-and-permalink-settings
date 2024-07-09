@@ -23,7 +23,7 @@ Perfect for developers and site owners looking to optimize their WordPress site 
 
 == Key Features ==
 
-* Custom archive page selection for post types to any regular page as archive page
+* Custom archive page selection for post types to use any regular page as archive page
 * Flexible permalink customization of custom post types or custom taxonomies
 * More SEO-friendly URL structures
 * Easy integration with existing WordPress settings
