@@ -318,7 +318,11 @@ final class WordPress
             return;
         }
 
-        if ($postAfter->post_name === $postBefore->post_name && $postAfter->post_status === $postBefore->post_status) {
+        if (
+            $postAfter->post_name === $postBefore->post_name &&
+            $postAfter->post_status === $postBefore->post_status &&
+            $postAfter->post_parent === $postBefore->post_parent
+        ) {
             return;
         }
 
