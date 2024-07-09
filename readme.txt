@@ -79,7 +79,7 @@ If you notice that your permalink changes aren't reflecting on your site, try th
 This action flushes the rewrite rules and often resolves issues with permalinks not updating. If the problem persists, try deactivating and reactivating the plugin, then save your permalinks again.
 
 = Do I need to update permalinks after changing archive pages or custom post type/taxonomy slugs? =
-Yes, it's a good practice to resave your permalinks after making changes to archive pages or modifying slugs. To do this:
+Regular not but if have any trouble it's a good practice to resave your permalinks after making changes to archive pages or modifying slugs. To do this:
 
 1. Go to Settings > Permalinks
 2. Scroll to the bottom and click "Save Changes"
