@@ -90,7 +90,7 @@ This ensures that WordPress regenerates its rewrite rules with your new settings
 = 1.5 =
 * Flush rewrite rules when post_parent changes
 * Renamed plugin main file
-**Notice:** The plugin may gets deactivated after the update, due a file rename. Just activate it again.
+**Notice:** The plugin may gets deactivated after the update, due a file rename. Just activate it again and resave Permalinks and Reading settings.
 
 = 1.4 =
 * Display a 404 page when archive page does not exists in combination with wpml
