@@ -3,7 +3,7 @@ Contributors: timohubois
 Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.0
 Tested up to: 6.5
-Stable tag: 1.4
+Stable tag: 1.5
 Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
