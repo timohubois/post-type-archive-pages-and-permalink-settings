@@ -8,7 +8,7 @@ Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Use pages as archive page for your custom post types and enhance WordPress SEO by controlling permalinks for custom post types and/or custom taxonomies.
+Use archive pages for custom post types and improve WordPress SEO by managing permalinks for custom post types and taxonomies.
 
 == Description ==
 
@@ -48,6 +48,10 @@ Check out the Plugin [GitHub Repository](https://github.com/timohubois/post-type
 3. Activate the plugin through the ‘Plugins’ menu in WordPress
 
 == Frequently Asked Questions ==
+
+= How to programmatically get the post used as the archive page for a custom post type? =
+
+An example can be found in the [GitHub Repository](https://github.com/timohubois/post-type-archive-pages-and-permalink-settings/).
 
 = Is this plugin compatible with WPML? =
 The plugin works with WPML in the same as WPML interacts with WordPress. The archive page should be available in all languages (otherwise you get an 404) and it is not possible to select a archive page per language.
