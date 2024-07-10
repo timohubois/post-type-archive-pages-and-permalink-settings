@@ -113,7 +113,7 @@ final class OptionsPermalinksTaxonomies
             return;
         }
 
-        usort($supportedTaxonomies, function ($a, $b) {
+        usort($supportedTaxonomies, function ($a, $b): int {
             return strcmp($a->name, $b->name);
         });
 

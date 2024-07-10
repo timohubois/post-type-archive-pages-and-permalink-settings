@@ -94,7 +94,7 @@ final class OptionsReadingPostTypes
             return;
         }
 
-        usort($supportedPostTypes, function ($a, $b) {
+        usort($supportedPostTypes, function ($a, $b): int {
             return strcmp($a->name, $b->name);
         });
 
