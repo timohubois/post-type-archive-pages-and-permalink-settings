@@ -49,8 +49,8 @@ final class WordPress
                 continue;
             }
 
-            $postTypeArchivePageSlug = get_post_field('post_name', $postTypeArchivePageId);
-            if ($postTypeArchivePageSlug === $postTypeSlug) {
+            $postTypeArchivePageUri = get_page_uri($postTypeArchivePageId);
+            if ($postTypeArchivePageUri === $postTypeSlug) {
                 continue;
             }
 
