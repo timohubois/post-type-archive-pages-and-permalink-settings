@@ -187,12 +187,20 @@ final class Wpml
 
             $pageForArchiveUris = [];
             foreach ($languages as $language) {
-                $pageForArchiveUris[] = $this->getPageForArchiveUri($postId, $language['code']);
+                $languagePageArchiveUri = $this->getPageForArchiveUri($postId, $language['code']);
+
+                if ($languagePageArchiveUri === '') {
+                    continue;
+                }
+
+                $pageForArchiveUris[] = $languagePageArchiveUri;
             }
 
             if ($pageForArchiveUris === []) {
                 continue;
             }
+
+            $pageForArchiveUris = array_unique($pageForArchiveUris);
 
             $replace = '(?:' . implode('|', $pageForArchiveUris) . ')';
             $keys = array_keys($rules);
