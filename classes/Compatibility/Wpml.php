@@ -168,9 +168,6 @@ final class Wpml
         $currentLanguage = apply_filters('wpml_current_language', null);
 
         foreach ($optionsReadingPostTypes as $postType => $postId) {
-            if ($postType === 'retailer') {
-                $pause = true;
-            }
             $currentLanguageArchiveUri = $this->getPageForArchiveUri($postId, $currentLanguage);
             foreach ($languages as $language) {
                 $languageArchiveUri = $this->getPageForArchiveUri($postId, $language['code']);
@@ -237,19 +234,20 @@ final class Wpml
             return $postLink;
         }
 
-        $currentLanguage = apply_filters('wpml_current_language', null);
+        $postLanguageDetails = apply_filters('wpml_post_language_details', null, $wpPost->ID);
+        $postLanguage = $postLanguageDetails['language_code'];
         $defaultLanguage = apply_filters('wpml_default_language', null);
 
         if ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === []) {
             $pageForArchiveUriDefaultLanguage = $this->getPageForArchiveUri($pageForArchiveId, $defaultLanguage);
-            $pageForArchiveUriCurrentLanguage = $this->getPageForArchiveUri($pageForArchiveId, $currentLanguage);
+            $pageForArchiveUriCurrentLanguage = $this->getPageForArchiveUri($pageForArchiveId, $postLanguage);
 
             if ($pageForArchiveUriDefaultLanguage !== $pageForArchiveUriCurrentLanguage) {
                 return str_replace($pageForArchiveUriDefaultLanguage, $pageForArchiveUriCurrentLanguage, $postLink);
             }
         }
 
-        if ($currentLanguage === $defaultLanguage) {
+        if ($postLanguage === $defaultLanguage) {
             return $postLink;
         }
 
@@ -260,7 +258,7 @@ final class Wpml
 
         // Get translation of the base URI
         $baseUriDefaultLanguage = apply_filters('wpml_translate_single_string', $baseUri, 'WordPress', 'URL slug: ' . $postType, $defaultLanguage);
-        $baseUriCurrentLanguage = apply_filters('wpml_translate_single_string', $baseUri, 'WordPress', 'URL slug: ' . $postType, $currentLanguage);
+        $baseUriCurrentLanguage = apply_filters('wpml_translate_single_string', $baseUri, 'WordPress', 'URL slug: ' . $postType, $postLanguage);
         $postLink = str_replace($baseUriDefaultLanguage, $baseUriCurrentLanguage, $postLink);
 
         return $postLink;
