@@ -9,6 +9,7 @@ use Ptatap\Features\OptionsReadingPostTypes;
 use Ptatap\Features\SupportedPostTypes;
 use WP_Admin_Bar;
 use WP_Post;
+use WP_Query;
 
 defined('ABSPATH') || exit;
 
@@ -16,9 +17,8 @@ final class WordPress
 {
     public function __construct()
     {
-        add_action('wp_loaded', [$this, 'addPostTypeRewriteRule'], 20);
         add_filter('rewrite_rules_array', [$this, 'updateTaxonomyRewriteRulesOrder']);
-        add_action('template_redirect', [$this, 'redirectPostTypeSlugToArchivePage']);
+        add_action('template_redirect', [$this, 'handle404']);
 
         add_filter('wp_title', [$this, 'updateTitle']);
         add_filter('get_the_archive_title', [$this, 'updateTitle']);
@@ -28,38 +28,6 @@ final class WordPress
         add_action('admin_bar_menu', [$this, 'addAdminBarEditLink'], 80);
         add_action('display_post_states', [$this, 'addPostStateLabel'], 10, 2);
         add_action('post_updated', [$this, 'postUpdated'], 10, 3);
-    }
-
-    public function addPostTypeRewriteRule(): void
-    {
-        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-        $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
-
-        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false || ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === [])) {
-            return;
-        }
-
-        foreach ($optionsPermalinksPostTypes as $postType => $postTypeSlug) {
-            $postTypeArchivePageId = $optionsReadingPostTypes[$postType] ?? null;
-            if (!$postTypeArchivePageId) {
-                continue;
-            }
-
-            if (!$postTypeSlug) {
-                continue;
-            }
-
-            $postTypeArchivePageUri = get_page_uri($postTypeArchivePageId);
-            if ($postTypeArchivePageUri === $postTypeSlug) {
-                continue;
-            }
-
-            add_rewrite_rule(
-                $postTypeSlug . '/?$',
-                'index.php?pagename=' . $postTypeSlug,
-                'top'
-            );
-        }
     }
 
     public function updateTaxonomyRewriteRulesOrder(array $rules): array
@@ -76,7 +44,7 @@ final class WordPress
             if ($taxonomySlug) {
                 $filteredRules = array_filter(
                     $rules,
-                    static fn($key): bool => str_starts_with($key, $taxonomySlug),
+                    static fn ($key): bool => str_starts_with($key, $taxonomySlug),
                     ARRAY_FILTER_USE_KEY
                 );
                 $nonMatchingRules = array_diff_key($rules, $filteredRules);
@@ -87,40 +55,40 @@ final class WordPress
         return $rules;
     }
 
-    public function redirectPostTypeSlugToArchivePage(): void
+    public function handle404()
     {
-        global $wp_query;
-
-        $isNameOrPageNameSet = isset($wp_query->query['name']) || isset($wp_query->query['pagename']);
-
-        if (!$isNameOrPageNameSet) {
-            return;
-        }
-
-        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-        $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
-
-        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false || ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === [])) {
-            return;
-        }
-
-        foreach ($optionsPermalinksPostTypes as $postType => $postTypeSlug) {
-            $postTypeArchivePageId = $optionsReadingPostTypes[$postType] ?? null;
-            if (!$postTypeArchivePageId) {
-                continue;
+        if (is_404()) {
+            $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
+            if ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === []) {
+                return;
             }
 
-            if (!$postTypeSlug) {
-                continue;
+            $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+            if ($optionsReadingPostTypes === false || $optionsReadingPostTypes === []) {
+                return;
             }
 
-            if (
-                (isset($wp_query->query['name']) && $wp_query->query['name'] === $postTypeSlug && $postTypeArchivePageId) ||
-                (isset($wp_query->query['pagename']) && $wp_query->query['pagename'] === $postTypeSlug && $postTypeArchivePageId)
-            ) {
-                wp_redirect(get_post_type_archive_link($postType), 301);
-                exit();
+            $requestUri = $_SERVER['REQUEST_URI'];
+            $requestUri = trim($requestUri, '/');
+
+            foreach ($optionsPermalinksPostTypes as $postType => $postTypeSlug) {
+                $postTypeArchivePageId = $optionsReadingPostTypes[$postType] ?? null;
+                if (!$postTypeArchivePageId) {
+                    continue;
+                }
+
+                if (!$postTypeSlug) {
+                    continue;
+                }
+
+                $postTypeArchivePageUri = get_page_uri($postTypeArchivePageId);
+                if (str_ends_with($requestUri, $postTypeSlug) || str_ends_with($requestUri, $postTypeArchivePageUri)) {
+                    wp_redirect(get_post_type_archive_link($postType), 301);
+                    exit;
+                }
+
             }
+
         }
     }
 
