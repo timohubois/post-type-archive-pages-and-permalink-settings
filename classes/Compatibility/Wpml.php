@@ -29,6 +29,7 @@ final class Wpml
             add_filter('wpml_alternate_hreflang', [$this, 'setWpmlAlternateHrefLang'], 10, 2);
 
             add_action('template_redirect', [$this, 'redirectTo404IfArchivePageNotFoundInCurrentLanguage'], 10);
+            add_action('update_option_' . OptionsReadingPostTypes::OPTION_NAME, [$this, 'setOptionValueToDefaultLanguage'], 10, 2);
         }
     }
 
@@ -420,6 +421,25 @@ final class Wpml
         $wp_query->set_404();
         status_header(404);
         nocache_headers();
+    }
+
+    public function setOptionValueToDefaultLanguage(mixed $old_value, mixed $value): array|string
+    {
+        if ($old_value === $value) {
+            return $value;
+        }
+
+        if ($value === [] || $value === false) {
+            return $value;
+        }
+
+        $defaultLanguage = apply_filters('wpml_default_language', null);
+        foreach ($value as $postType => $postId) {
+            $returnOriginalIfMissing = true;
+            $value[$postType] = (string) $this->getWpmlObjectId($postId, $postType, $returnOriginalIfMissing, $defaultLanguage);
+        }
+
+        return $value;
     }
 
     private function getPageForArchiveUri(string|int|null|bool $pageForArchiveId = null, string|null $languageCode = null): string

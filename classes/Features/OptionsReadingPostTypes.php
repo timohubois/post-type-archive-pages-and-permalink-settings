@@ -120,7 +120,7 @@ final class OptionsReadingPostTypes
                             'name' => esc_attr(sprintf('%s[%s]', $optionName, $postType->name)),
                             'echo' => 1,
                             'show_option_none' => esc_attr__('&mdash; Select &mdash;'),
-                            'option_none_value' => '0',
+                            'option_none_value' => '',
                             'selected' => esc_attr($selected)
                         ]
                     );
