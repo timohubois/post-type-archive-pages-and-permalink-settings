@@ -164,49 +164,64 @@ final class Wpml
     {
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
         $languages = apply_filters('wpml_active_languages', [], 'skip_missing=0');
+        $currentLanguage = apply_filters('wpml_current_language', null);
 
-        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false || empty($languages)) {
-            return $rules;
-        }
-
-        $defaultLanguageCode = apply_filters('wpml_default_language', null);
         foreach ($optionsReadingPostTypes as $postType => $postId) {
-            $pageForArchiveUri = $this->getPageForArchiveUri($postId, $defaultLanguageCode);
-            $postTypeObject = get_post_type_object($postType);
-            if ($pageForArchiveUri === '') {
-                continue;
+            if ($postType === 'retailer') {
+                $pause = true;
             }
-
-            if ($pageForArchiveUri === '0') {
-                continue;
-            }
-
-            if (empty($postTypeObject)) {
-                continue;
-            }
-
-            $pageForArchiveUris = [];
+            $currentLanguageArchiveUri = $this->getPageForArchiveUri($postId, $currentLanguage);
             foreach ($languages as $language) {
-                $pageForArchiveUris[] = $this->getPageForArchiveUri($postId, $language['code']);
-            }
-
-            if ($pageForArchiveUris === []) {
-                continue;
-            }
-
-            $replace = '(?:' . implode('|', $pageForArchiveUris) . ')';
-            $keys = array_keys($rules);
-            $values = array_values($rules);
-            foreach ($keys as &$key) {
-                if (str_contains($key, $pageForArchiveUri) || str_contains($key, $postTypeObject->has_archive)) {
-                    $key = str_replace($postTypeObject->has_archive ?? $pageForArchiveUri, $replace, $key);
+                $languageArchiveUri = $this->getPageForArchiveUri($postId, $language['code']);
+                if ($currentLanguageArchiveUri === $languageArchiveUri || $currentLanguageArchiveUri === '' || $languageArchiveUri === '') {
+                    continue;
                 }
-            }
 
-            $rules = array_combine($keys, $values);
+                $updatedRules = [];
+                foreach ($rules as $key => $rule) {
+                    // Always add the original rule
+                    $updatedRules[$key] = $rule;
+
+                    if (str_contains($key, $currentLanguageArchiveUri)) {
+                        $newKey = str_replace($currentLanguageArchiveUri, $languageArchiveUri, $key);
+                        $updatedRules[$newKey] = $rule;
+
+                        $translatedPermalinkBaseUri = $this->getTranslatedPermalinkBaseUri($currentLanguageArchiveUri, $postType, $language['code']);
+                        if ($translatedPermalinkBaseUri !== null) {
+                            $newKey = str_replace($currentLanguageArchiveUri, $translatedPermalinkBaseUri, $key);
+                            $updatedRules[$newKey] = $rule;
+                        }
+                    }
+
+                    if (str_contains($key, $languageArchiveUri)) {
+                        $newKey = str_replace($languageArchiveUri, $currentLanguageArchiveUri, $key);
+                        $updatedRules[$newKey] = $rule;
+
+                        $translatedPermalinkBaseUri = $this->getTranslatedPermalinkBaseUri($currentLanguageArchiveUri, $postType, $language['code']);
+                        if ($translatedPermalinkBaseUri !== null) {
+                            $newKey = str_replace($languageArchiveUri, $translatedPermalinkBaseUri, $key);
+                            $updatedRules[$newKey] = $rule;
+                        }
+                    }
+                }
+
+                $rules = $updatedRules;
+            }
+        }
+        return $rules;
+    }
+
+    public function getTranslatedPermalinkBaseUri(string $baseUri, string $postType, string $language): string|null
+    {
+        $defaultLanguage = apply_filters('wpml_default_language', null);
+        $baseUriDefaultLanguage = apply_filters('wpml_translate_single_string', $baseUri, 'WordPress', 'URL slug: ' . $postType, $defaultLanguage);
+        $baseUriCurrentLanguage = apply_filters('wpml_translate_single_string', $baseUri, 'WordPress', 'URL slug: ' . $postType, $language);
+
+        if ($baseUriDefaultLanguage === $baseUriCurrentLanguage) {
+            return null;
         }
 
-        return $rules;
+        return $baseUriCurrentLanguage;
     }
 
     public function getPostTypeLink(string $postLink, WP_Post $wpPost): string
@@ -214,20 +229,40 @@ final class Wpml
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
         $postType = get_post_field('post_type', $wpPost);
 
-        if ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === [] || $optionsPermalinksPostTypes[$postType]) {
-            return $postLink;
-        }
-
-        $currentLanguage = apply_filters('wpml_current_language', null);
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-        $pageForArchiveId = $optionsReadingPostTypes[$wpPost->post_type] ?? null;
+        $pageForArchiveId = $optionsReadingPostTypes[$postType] ?? null;
 
         if (!$pageForArchiveId) {
             return $postLink;
         }
 
-        $pageForArchiveUri = $this->getPageForArchiveUri($pageForArchiveId, $currentLanguage);
-        return home_url($pageForArchiveUri) ?: $postLink;
+        $currentLanguage = apply_filters('wpml_current_language', null);
+        $defaultLanguage = apply_filters('wpml_default_language', null);
+
+        if ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === []) {
+            $pageForArchiveUriDefaultLanguage = $this->getPageForArchiveUri($pageForArchiveId, $defaultLanguage);
+            $pageForArchiveUriCurrentLanguage = $this->getPageForArchiveUri($pageForArchiveId, $currentLanguage);
+
+            if ($pageForArchiveUriDefaultLanguage !== $pageForArchiveUriCurrentLanguage) {
+                return str_replace($pageForArchiveUriDefaultLanguage, $pageForArchiveUriCurrentLanguage, $postLink);
+            }
+        }
+
+        if ($currentLanguage === $defaultLanguage) {
+            return $postLink;
+        }
+
+        $baseUri = $optionsPermalinksPostTypes[$postType] ?? null;
+        if (!$baseUri) {
+            return $postLink;
+        }
+
+        // Get translation of the base URI
+        $baseUriDefaultLanguage = apply_filters('wpml_translate_single_string', $baseUri, 'WordPress', 'URL slug: ' . $postType, $defaultLanguage);
+        $baseUriCurrentLanguage = apply_filters('wpml_translate_single_string', $baseUri, 'WordPress', 'URL slug: ' . $postType, $currentLanguage);
+        $postLink = str_replace($baseUriDefaultLanguage, $baseUriCurrentLanguage, $postLink);
+
+        return $postLink;
     }
 
     public function getPostTypeArchiveLink(string $link, string $post_type): string
