@@ -68,7 +68,7 @@ final class WordPress
                 return;
             }
 
-            $requestUri = $_SERVER['REQUEST_URI'];
+            $requestUri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '';
             $requestUri = trim($requestUri, '/');
 
             foreach ($optionsPermalinksPostTypes as $postType => $postTypeSlug) {
@@ -86,9 +86,7 @@ final class WordPress
                     wp_redirect(get_post_type_archive_link($postType), 301);
                     exit;
                 }
-
             }
-
         }
     }
 
