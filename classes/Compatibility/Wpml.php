@@ -13,7 +13,7 @@ final class Wpml
 {
     public function __construct()
     {
-        if (in_array('sitepress-multilingual-cms/sitepress.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+        if (self::isWpmlActive()) {
             // Modifies the stored options for the post type archive pages based on the current language.
             add_filter('ptatap_post_type_reading_settings', [$this, 'setTranslatedPostTypeReadingSettings'], 10, 1);
 
@@ -31,6 +31,11 @@ final class Wpml
             add_action('template_redirect', [$this, 'redirectTo404IfArchivePageNotFoundInCurrentLanguage'], 10);
             add_action('pre_update_option_' . OptionsReadingPostTypes::OPTION_NAME, [$this, 'setOptionValueToDefaultLanguage'], PHP_INT_MAX, 2);
         }
+    }
+
+    public static function isWpmlActive(): bool
+    {
+        return in_array('sitepress-multilingual-cms/sitepress.php', apply_filters('active_plugins', get_option('active_plugins')));
     }
 
     public function setTranslatedPostTypeReadingSettings(array|bool $postTypeReadingSettings): array|bool
