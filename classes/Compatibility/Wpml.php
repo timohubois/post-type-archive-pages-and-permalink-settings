@@ -35,7 +35,7 @@ final class Wpml
 
     public static function isWpmlActive(): bool
     {
-        return in_array('sitepress-multilingual-cms/sitepress.php', apply_filters('active_plugins', get_option('active_plugins')));
+        return is_plugin_active('sitepress-multilingual-cms/sitepress.php');
     }
 
     public function setTranslatedPostTypeReadingSettings(array|bool $postTypeReadingSettings): array|bool

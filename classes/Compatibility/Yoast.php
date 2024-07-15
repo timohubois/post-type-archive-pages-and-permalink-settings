@@ -10,7 +10,7 @@ final class Yoast
 {
     public function __construct()
     {
-        if (in_array('wordpress-seo/wp-seo.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+        if (is_plugin_active('wordpress-seo/wp-seo.php')) {
             add_action('edit_form_after_title', [$this, 'renderAdminNoticeClassicEditor']);
             add_action('admin_print_footer_scripts', [$this, 'renderBlockEditorNotice']);
         }
