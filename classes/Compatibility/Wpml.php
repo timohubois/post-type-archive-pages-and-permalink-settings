@@ -29,7 +29,7 @@ final class Wpml
             add_filter('wpml_alternate_hreflang', [$this, 'setWpmlAlternateHrefLang'], 10, 2);
 
             add_action('template_redirect', [$this, 'redirectTo404IfArchivePageNotFoundInCurrentLanguage'], 10);
-            add_action('update_option_' . OptionsReadingPostTypes::OPTION_NAME, [$this, 'setOptionValueToDefaultLanguage'], 10, 2);
+            add_action('pre_update_option_' . OptionsReadingPostTypes::OPTION_NAME, [$this, 'setOptionValueToDefaultLanguage'], PHP_INT_MAX, 2);
         }
     }
 
@@ -437,26 +437,62 @@ final class Wpml
         nocache_headers();
     }
 
-    public function setOptionValueToDefaultLanguage(mixed $old_value, mixed $value): array|string
+    public function setOptionValueToDefaultLanguage($value, $old_value): array|string|bool
     {
-        if ($old_value === $value) {
-            return $value;
-        }
-
         if ($value === [] || $value === false) {
             return $value;
         }
 
-        $defaultLanguage = apply_filters('wpml_default_language', null);
-        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-
-        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
+        if (json_encode($old_value) === json_encode($value)) {
             return $value;
         }
 
-        foreach ($value as $postType => $postId) {
-            $returnOriginalIfMissing = true;
-            $value[$postType] = (string) $this->getWpmlObjectId($postId, $postType, $returnOriginalIfMissing, $defaultLanguage);
+        global $wpdb;
+
+        $defaultLanguage = apply_filters('wpml_default_language', null);
+
+        if (!$defaultLanguage) {
+            return $value;
+        }
+
+        // Inline function to get the default language page directly from the database, due to the WPML API not being available at this point.
+        $getDefaultLanguagePage = function ($pageId) use ($wpdb, $defaultLanguage) {
+            $query = $wpdb->prepare(
+                "SELECT trid, element_id
+                FROM {$wpdb->prefix}icl_translations
+                WHERE element_id = %d AND element_type = %s",
+                $pageId,
+                'post_page'
+            );
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared --its prepared at $query
+            $result = $wpdb->get_row($query);
+
+            if (!$result) {
+                return $pageId;
+            }
+
+            $query = $wpdb->prepare(
+                "SELECT element_id
+                FROM {$wpdb->prefix}icl_translations
+                WHERE trid = %d AND language_code = %s AND element_type = %s",
+                $result->trid,
+                $defaultLanguage,
+                'post_page'
+            );
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared --its prepared at $query
+            $defaultPageId = $wpdb->get_var($query);
+
+            return $defaultPageId ? $defaultPageId : $pageId;
+        };
+
+        if (is_string($value) || is_numeric($value)) {
+            return (string) $getDefaultLanguagePage($value);
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $postType => $pageId) {
+                $value[$postType] = (string) $getDefaultLanguagePage($pageId);
+            }
         }
 
         return $value;
