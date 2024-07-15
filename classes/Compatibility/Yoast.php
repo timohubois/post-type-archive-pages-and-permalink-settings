@@ -10,6 +10,10 @@ final class Yoast
 {
     public function __construct()
     {
+        if (!function_exists('is_plugin_active')) {
+            include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        }
+
         if (is_plugin_active('wordpress-seo/wp-seo.php')) {
             add_action('edit_form_after_title', [$this, 'renderAdminNoticeClassicEditor']);
             add_action('admin_print_footer_scripts', [$this, 'renderBlockEditorNotice']);
