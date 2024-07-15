@@ -91,6 +91,9 @@ Regular not but if you have any trouble it's a good practice to resave your perm
 This ensures that WordPress regenerates its rewrite rules with your new settings.
 
 == Changelog ==
+= 1.8.2 =
+* fix use is_plugin_active function
+
 = 1.8.1 =
 * use is_plugin_active function
 
