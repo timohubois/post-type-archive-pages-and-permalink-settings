@@ -164,6 +164,11 @@ final class Wpml
     public function setRewriteRulesArray(array $rules): array
     {
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
+            return $rules;
+        }
+
         $languages = apply_filters('wpml_active_languages', [], 'skip_missing=0');
         $currentLanguage = apply_filters('wpml_current_language', null);
 
@@ -228,6 +233,11 @@ final class Wpml
         $postType = get_post_field('post_type', $wpPost);
 
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
+            return $postLink;
+        }
+
         $pageForArchiveId = $optionsReadingPostTypes[$postType] ?? null;
 
         if (!$pageForArchiveId) {
@@ -267,6 +277,11 @@ final class Wpml
     public function getPostTypeArchiveLink(string $link, string $post_type): string
     {
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
+            return $link;
+        }
+
         $pageForArchiveId = $optionsReadingPostTypes[$post_type] ?? null;
         $currentLanguage = apply_filters('wpml_current_language', null);
 
@@ -399,6 +414,7 @@ final class Wpml
         }
 
         $supportedPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+
         if ($supportedPostTypes === [] || $supportedPostTypes === false) {
             return;
         }
@@ -432,6 +448,12 @@ final class Wpml
         }
 
         $defaultLanguage = apply_filters('wpml_default_language', null);
+        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
+            return $value;
+        }
+
         foreach ($value as $postType => $postId) {
             $returnOriginalIfMissing = true;
             $value[$postType] = (string) $this->getWpmlObjectId($postId, $postType, $returnOriginalIfMissing, $defaultLanguage);
