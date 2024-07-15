@@ -132,9 +132,9 @@ final class OptionsReadingPostTypes
         <?php
     }
 
-    public function maybeFlushRewriteRules(mixed $old_value, mixed $value): void
+    public function maybeFlushRewriteRules(mixed $oldValue, mixed $value, string $option): void
     {
-        if ($old_value === $value) {
+        if (json_encode($oldValue) === json_encode($value)) {
             return;
         }
 
