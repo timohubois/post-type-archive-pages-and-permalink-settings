@@ -9,7 +9,6 @@ use Ptatap\Features\OptionsReadingPostTypes;
 use Ptatap\Features\SupportedPostTypes;
 use WP_Admin_Bar;
 use WP_Post;
-use WP_Query;
 
 defined('ABSPATH') || exit;
 
