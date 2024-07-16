@@ -86,6 +86,11 @@ final class OptionsPermalinksPostTypes
             $values = array_values($array);
             $values = array_map('sanitize_text_field', $values);
 
+            // Remove trailing slashes from values.
+            $values = array_map(function ($value) {
+                return trim($value, '/');
+            }, $values);
+
             $optionValue = array_combine($keys, $values);
 
             update_option(self::OPTION_NAME, $optionValue);
