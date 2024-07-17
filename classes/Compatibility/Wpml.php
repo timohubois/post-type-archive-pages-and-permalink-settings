@@ -283,7 +283,7 @@ final class Wpml
         return trailingslashit($postLink);
     }
 
-    public function getPostTypeArchiveLink(string $link, string $post_type): string
+    public function getPostTypeArchiveLink(string $link, string $postType): string
     {
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
@@ -291,15 +291,24 @@ final class Wpml
             return trailingslashit($link);
         }
 
-        $pageForArchiveId = $optionsReadingPostTypes[$post_type] ?? null;
+        $pageForArchiveId = $optionsReadingPostTypes[$postType] ?? null;
+
+        if ($pageForArchiveId === null) {
+            return trailingslashit($link);
+        }
+
         $currentLanguage = apply_filters('wpml_current_language', null);
 
-        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false || empty($currentLanguage) || empty($currentLanguage)) {
+        if (empty($currentLanguage)) {
             return trailingslashit($link);
         }
 
         $pageForArchiveUri = $this->getPageForArchiveUri($pageForArchiveId, $currentLanguage);
-        return trailingslashit(home_url($pageForArchiveUri)) ?: trailingslashit($link);
+        if ($pageForArchiveUri === '') {
+            return '';
+        }
+
+        return apply_filters('wpml_permalink', home_url($pageForArchiveUri), $currentLanguage);
     }
 
     public function setWpmlLsLanguageUrls(string $url, array $langs): string
