@@ -4,7 +4,7 @@
  * Plugin Name:       PTAPS - Post Type Archive Pages and Permalink Settings
  * Plugin URI:        https://github.com/timohubois/post-type-archive-pages-and-permalink-settings/
  * Description:       Use archive pages for custom post types and improve WordPress SEO by managing permalinks for custom post types and taxonomies.
- * Version:           1.8.3
+ * Version:           1.8.4
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            Timo Hubois
