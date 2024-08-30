@@ -320,7 +320,7 @@ final class Wpml
         }
 
         foreach ($optionsReadingPostTypes as $postType => $postId) {
-            if (!is_post_type_archive($postType)) {
+            if (!is_post_type_archive($postType) || empty($postId)) {
                 continue;
             }
 
@@ -343,7 +343,7 @@ final class Wpml
         }
 
         foreach ($optionsReadingPostTypes as $postType => $postId) {
-            if (!is_post_type_archive($postType)) {
+            if (!is_post_type_archive($postType) || empty($postId)) {
                 continue;
             }
 
