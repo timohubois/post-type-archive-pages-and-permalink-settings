@@ -437,6 +437,8 @@ final class Wpml
     {
 
         global $wp_query;
+        global $wp;
+
         $queriedPostType = $wp_query->query_vars['post_type'];
 
         $isPostTypeArchive = is_post_type_archive($queriedPostType);
@@ -456,10 +458,11 @@ final class Wpml
         }
 
         $currentLanguage = apply_filters('wpml_current_language', null);
-        $returnOriginalIfMissing = false;
-        $getWpmlObjectId = $this->getWpmlObjectId($pageForArchiveId, $queriedPostType, $returnOriginalIfMissing, $currentLanguage);
 
-        if ($getWpmlObjectId) {
+        $requestedUri = $wp->request;
+        $postArchivePermalink = $this->getPageForArchiveUri($pageForArchiveId, $currentLanguage);
+
+        if (str_contains($requestedUri, $postArchivePermalink)) {
             return;
         }
 
