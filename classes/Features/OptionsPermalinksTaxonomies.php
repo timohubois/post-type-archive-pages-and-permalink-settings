@@ -87,7 +87,7 @@ final class OptionsPermalinksTaxonomies
             $values = array_map('sanitize_text_field', $values);
 
             // Remove trailing slashes from values.
-            $values = array_map(function ($value) {
+            $values = array_map(function ($value): string {
                 return trim($value, '/');
             }, $values);
 
