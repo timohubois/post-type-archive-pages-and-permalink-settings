@@ -3,7 +3,7 @@ Contributors: timohubois
 Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.0
 Tested up to: 6.8
-Stable tag: 1.8.7
+Stable tag: 1.9.0
 Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -44,8 +44,8 @@ Check out the Plugin [GitHub Repository](https://github.com/timohubois/post-type
 = INSTALL MANUALLY THROUGH FTP =
 
 1. Download the plugin on the WordPress plugin page
-2. Upload the ‘archive-pages-and-permalink-settings-for-post-types-and-taxonomies’ folder to the /wp-content/plugins/ directory
-3. Activate the plugin through the ‘Plugins’ menu in WordPress
+2. Upload the 'archive-pages-and-permalink-settings-for-post-types-and-taxonomies' folder to the /wp-content/plugins/ directory
+3. Activate the plugin through the 'Plugins' menu in WordPress
 
 == Frequently Asked Questions ==
 
@@ -91,6 +91,9 @@ Regular not but if you have any trouble it's a good practice to resave your perm
 This ensures that WordPress regenerates its rewrite rules with your new settings.
 
 == Changelog ==
+= 1.9.0 =
+* handle next and previous rel links (Yoast SEO compatibility)
+
 = 1.8.7 =
 * improve post type archive handling when using wpml
 
