@@ -19,9 +19,84 @@ final class Yoast
             add_action('edit_form_after_title', [$this, 'renderAdminNoticeClassicEditor']);
             add_action('admin_print_footer_scripts', [$this, 'renderBlockEditorNotice']);
 
+            add_filter('wpseo_canonical', [$this, 'wpseoCanonical']);
             add_filter('wpseo_next_rel_link', [$this, 'wpseoNextRelLink']);
             add_filter('wpseo_prev_rel_link', [$this, 'wpseoPrevRelLink']);
         }
+    }
+
+    public function renderAdminNoticeClassicEditor(): void
+    {
+        global $post;
+        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
+            return;
+        }
+
+        foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
+            if ((int)$postTypeArchivePageId === $post->ID) {
+                $title = $this->getAdminNoticeTitle();
+                $postTypeObject = get_post_type_object($postType);
+                $slug =  $postTypeObject->rewrite["slug"] !== '' ? $postTypeObject->rewrite["slug"] : $post->post_name;
+                $message = $this->getAdminNoticeContent($postType, $slug);
+
+                echo '<div class="notice notice-warning"><p><strong>' . esc_html($title) . '</strong></p><p>' . wp_kses_post($message) . '</p></div>';
+            }
+        }
+    }
+
+    public function renderBlockEditorNotice(): void
+    {
+        global $post;
+        $current_screen = get_current_screen();
+        if (method_exists($current_screen, 'is_block_editor') && $current_screen->is_block_editor()) {
+            $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+
+            if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
+                return;
+            }
+
+            foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
+                if ((int)$postTypeArchivePageId === $post->ID) {
+                    $title = $this->getAdminNoticeTitle();
+                    $postTypeObject = get_post_type_object($postType);
+                    $slug =  $postTypeObject->rewrite["slug"] !== '' ? $postTypeObject->rewrite["slug"] : $post->post_name;
+                    $adminNoticeContent = $this->getAdminNoticeContent($postType, $slug);
+
+?>
+                    <script type="text/javascript">
+                        (function($) {
+                            $(document).ready(function() {
+                                wp.data.dispatch('core/notices').createNotice(
+                                    'warning',
+                                    <?php echo json_encode('<p><strong>' . esc_html($title) . '</strong></p>' . wp_kses_post($adminNoticeContent)); ?>, {
+                                        __unstableHTML: true,
+                                        isDismissible: false,
+                                    }
+                                );
+                            });
+                        })(jQuery);
+                    </script>
+<?php
+                }
+            }
+        }
+    }
+
+    public function wpseoCanonical(string $canonical): string
+    {
+        if (is_post_type_archive()) {
+            $postType = get_post_type();
+            return get_post_type_archive_link($postType);
+        }
+
+        if (is_tax()) {
+            $taxonomy = get_taxonomy(get_queried_object()->taxonomy);
+            return get_term_link(get_queried_object(), $taxonomy);
+        }
+
+        return $canonical;
     }
 
     public function wpseoNextRelLink(string $link): string
@@ -138,65 +213,5 @@ final class Yoast
         $message .= '<br>' . __('This is the native behavior how Custom Post Type Archives are handled in this cases, currently.', 'post-type-archive-pages-and-permalink-settings');
 
         return $message;
-    }
-
-    public function renderAdminNoticeClassicEditor(): void
-    {
-        global $post;
-        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-
-        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
-            return;
-        }
-
-        foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
-            if ((int)$postTypeArchivePageId === $post->ID) {
-                $title = $this->getAdminNoticeTitle();
-                $postTypeObject = get_post_type_object($postType);
-                $slug =  $postTypeObject->rewrite["slug"] !== '' ? $postTypeObject->rewrite["slug"] : $post->post_name;
-                $message = $this->getAdminNoticeContent($postType, $slug);
-
-                echo '<div class="notice notice-warning"><p><strong>' . esc_html($title) . '</strong></p><p>' . wp_kses_post($message) . '</p></div>';
-            }
-        }
-    }
-
-    public function renderBlockEditorNotice(): void
-    {
-        global $post;
-        $current_screen = get_current_screen();
-        if (method_exists($current_screen, 'is_block_editor') && $current_screen->is_block_editor()) {
-            $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-
-            if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
-                return;
-            }
-
-            foreach ($optionsReadingPostTypes as $postType => $postTypeArchivePageId) {
-                if ((int)$postTypeArchivePageId === $post->ID) {
-                    $title = $this->getAdminNoticeTitle();
-                    $postTypeObject = get_post_type_object($postType);
-                    $slug =  $postTypeObject->rewrite["slug"] !== '' ? $postTypeObject->rewrite["slug"] : $post->post_name;
-                    $adminNoticeContent = $this->getAdminNoticeContent($postType, $slug);
-
-                    ?>
-                    <script type="text/javascript">
-                        (function($) {
-                            $(document).ready(function() {
-                                wp.data.dispatch('core/notices').createNotice(
-                                    'warning',
-                                    <?php echo json_encode('<p><strong>' . esc_html($title) . '</strong></p>' . wp_kses_post($adminNoticeContent)); ?>,
-                                    {
-                                        __unstableHTML: true,
-                                        isDismissible: false,
-                                    }
-                                );
-                            });
-                        })(jQuery);
-                    </script>
-                    <?php
-                }
-            }
-        }
     }
 }
