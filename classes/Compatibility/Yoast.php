@@ -3,6 +3,7 @@
 namespace Ptatap\Compatibility;
 
 use Ptatap\Features\OptionsReadingPostTypes;
+use WP_Rewrite;
 
 defined('ABSPATH') || exit;
 
@@ -17,7 +18,91 @@ final class Yoast
         if (is_plugin_active('wordpress-seo/wp-seo.php')) {
             add_action('edit_form_after_title', [$this, 'renderAdminNoticeClassicEditor']);
             add_action('admin_print_footer_scripts', [$this, 'renderBlockEditorNotice']);
+
+            add_filter('wpseo_next_rel_link', [$this, 'wpseoNextRelLink']);
+            add_filter('wpseo_prev_rel_link', [$this, 'wpseoPrevRelLink']);
         }
+    }
+
+    public function wpseoNextRelLink(string $link): string
+    {
+        return $this->fixRelLink($link);
+    }
+
+    public function wpseoPrevRelLink(string $link): string
+    {
+        return $this->fixRelLink($link);
+    }
+
+    private function fixRelLink(string $link): string
+    {
+        if (empty($link)) {
+            return $link;
+        }
+
+        $queriedObject = get_queried_object();
+        if (is_null($queriedObject)) {
+            return $link;
+        }
+
+        $taxonomy = $queriedObject->taxonomy ?? null;
+        $postType = get_taxonomy($taxonomy)->object_type[0] ?? $queriedObject->name ?? null;
+
+        if (is_null($taxonomy)) {
+            $archiveUrl = get_term_link($queriedObject);
+        } else {
+            $archiveUrl = get_post_type_archive_link($postType);
+        }
+
+        // Remove all existing query params from the archive url, they get may added later.
+        $pageArchiveUrl = parse_url($archiveUrl);
+        unset($pageArchiveUrl['query']);
+        $archiveUrl = $pageArchiveUrl['scheme'] . '://' . $pageArchiveUrl['host'] . $pageArchiveUrl['path'];
+        $archiveUrl = rtrim($archiveUrl, '/');
+
+        $wp_rewrite = new WP_Rewrite();
+        $pagedPaginationBase = $wp_rewrite->pagination_base;
+        $pagedPaginationBase = untrailingslashit($pagedPaginationBase);
+
+        $hasLinkPaginationBase = strpos($link, $pagedPaginationBase) !== false;
+        if (!$hasLinkPaginationBase) {
+            return $link;
+        }
+
+        $hrefFromLink = explode('href="', $link);
+        $hrefFromLink = $hrefFromLink[1];
+        $hrefFromLink = explode('"', $hrefFromLink);
+        $hrefFromLink = $hrefFromLink[0];
+
+        if (empty($hrefFromLink)) {
+            return $link;
+        }
+
+        $pageNumberFromLink = explode($pagedPaginationBase . '/', $hrefFromLink);
+        $pageNumberFromLink = (int)$pageNumberFromLink[count($pageNumberFromLink) - 1];
+
+        if ($pageNumberFromLink <= 0) {
+            return $link;
+        }
+
+        $pagedArchiveUrl = trailingslashit($archiveUrl) . trailingslashit($pagedPaginationBase) . $pageNumberFromLink;
+        $pagedArchiveUrl = $this->maybeAddQueryStringToUrl($pagedArchiveUrl);
+
+        return preg_replace('/href="[^"]*"/', 'href="' . $pagedArchiveUrl . '"', $link);
+    }
+
+    private function maybeAddQueryStringToUrl(string $link): string
+    {
+        global $wp;
+        $queryVars = $wp->query_vars;
+
+        foreach ($queryVars as $key => $value) {
+            if (isset($_GET[$key])) {
+                $link = add_query_arg($key, $value, $link);
+            }
+        }
+
+        return $link;
     }
 
     private function getAdminNoticeTitle(): string
