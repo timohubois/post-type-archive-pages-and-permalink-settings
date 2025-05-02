@@ -3,7 +3,6 @@
 namespace Ptatap\Compatibility;
 
 use Ptatap\Features\OptionsReadingPostTypes;
-use WP_Rewrite;
 
 defined('ABSPATH') || exit;
 
@@ -22,6 +21,7 @@ final class Yoast
             add_filter('wpseo_canonical', [$this, 'wpseoCanonical']);
             add_filter('wpseo_next_rel_link', [$this, 'wpseoNextRelLink']);
             add_filter('wpseo_prev_rel_link', [$this, 'wpseoPrevRelLink']);
+            add_filter('wpseo_adjacent_rel_url', [$this, 'wpseoAdjacentRelUrl'], 10, 3);
         }
     }
 
@@ -64,7 +64,7 @@ final class Yoast
                     $slug =  $postTypeObject->rewrite["slug"] !== '' ? $postTypeObject->rewrite["slug"] : $post->post_name;
                     $adminNoticeContent = $this->getAdminNoticeContent($postType, $slug);
 
-?>
+                    ?>
                     <script type="text/javascript">
                         (function($) {
                             $(document).ready(function() {
@@ -78,7 +78,7 @@ final class Yoast
                             });
                         })(jQuery);
                     </script>
-<?php
+                    <?php
                 }
             }
         }
@@ -86,25 +86,72 @@ final class Yoast
 
     public function wpseoCanonical(string $canonical): string
     {
-        if (!empty($canonical)) {
+        if (!is_post_type_archive() && !is_tax()) {
             return $canonical;
         }
 
-        if (is_post_type_archive() || is_tax()) {
-            return $this->getArchiveUrl($canonical);
-        }
-
-        return $canonical;
+        // Always return the current paginated/filter URL as canonical
+        global $wp;
+        $url = home_url(add_query_arg($wp->query_vars, $wp->request));
+        // If using pretty permalinks, you may need to reconstruct the URL as in your getQueriedArchiveUrl
+        return $this->getQueriedArchiveUrl($url);
     }
 
     public function wpseoNextRelLink(string $link): string
     {
+        if (!is_post_type_archive() && !is_tax()) {
+            return $link;
+        }
+
         return $this->fixRelLink($link);
     }
 
     public function wpseoPrevRelLink(string $link): string
     {
+        if (!is_post_type_archive() && !is_tax()) {
+            return $link;
+        }
+
         return $this->fixRelLink($link);
+    }
+
+    public function wpseoAdjacentRelUrl(?string $url, ?string $rel = null, $presentation = null)
+    {
+        if (is_null($rel)) {
+            return $url;
+        }
+
+        if (!is_post_type_archive() && !is_tax()) {
+            return $url;
+        }
+
+        global $wp_query;
+        $paged = (int) $wp_query->get('paged');
+        $isPaged = $paged > 1;
+
+        // If rel=prev and not paged, do not output a prev URL
+        if ($rel === 'prev' && !$isPaged) {
+            return null;
+        }
+
+        // Only reconstruct for rel=prev on page 2 if $url is empty so that archive link is used.
+        if ($rel === 'prev' && $paged === 2 && (!$url || $url === '')) {
+            $queriedObject = get_queried_object();
+            $taxonomy = $queriedObject->taxonomy ?? null;
+            $postType = $taxonomy ? get_taxonomy($taxonomy)->object_type[0] : ($queriedObject->name ?? null);
+
+            if ($taxonomy) {
+                $url = get_term_link($queriedObject);
+            } else {
+                $url = get_post_type_archive_link($postType);
+            }
+        }
+
+        if (empty($url)) {
+            return null;
+        }
+
+        return $this->getQueriedArchiveUrl($url);
     }
 
     private function fixRelLink(string $link): string
@@ -118,11 +165,11 @@ final class Yoast
         $urlFromLink = explode('"', $urlFromLink);
         $urlFromLink = $urlFromLink[0];
 
-        if (empty($urlFromLink)) {
+        if (!is_post_type_archive() && !is_tax()) {
             return $link;
         }
 
-        $newUrl = $this->getArchiveUrl($urlFromLink);
+        $newUrl = $this->getQueriedArchiveUrl($urlFromLink);
 
         if ($newUrl === $urlFromLink) {
             return $link;
@@ -131,11 +178,11 @@ final class Yoast
         return preg_replace('/href="[^"]*"/', 'href="' . $newUrl . '"', $link);
     }
 
-    private function getArchiveUrl(string $url): string
+    private function getQueriedArchiveUrl(string $originalUrl): string
     {
         $queriedObject = get_queried_object();
         if (is_null($queriedObject)) {
-            return $url;
+            return $originalUrl;
         }
 
         $taxonomy = $queriedObject->taxonomy ?? null;
@@ -153,11 +200,11 @@ final class Yoast
         $archiveUrl = $archiveUrl['scheme'] . '://' . $archiveUrl['host'] . $archiveUrl['path'];
         $archiveUrl = rtrim($archiveUrl, '/');
 
-        $wp_rewrite = new WP_Rewrite();
+        global $wp_rewrite;
         $pagedPaginationBase = $wp_rewrite->pagination_base;
         $pagedPaginationBase = untrailingslashit($pagedPaginationBase);
 
-        $pageNumberFromUrl = explode($pagedPaginationBase . '/', $url);
+        $pageNumberFromUrl = explode($pagedPaginationBase . '/', $originalUrl);
         $pageNumberFromUrl = (int)$pageNumberFromUrl[count($pageNumberFromUrl) - 1];
 
         $isUrlPaged = $pageNumberFromUrl > 0;
