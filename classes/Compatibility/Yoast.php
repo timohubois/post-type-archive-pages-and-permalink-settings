@@ -48,7 +48,7 @@ final class Yoast
         $taxonomy = $queriedObject->taxonomy ?? null;
         $postType = get_taxonomy($taxonomy)->object_type[0] ?? $queriedObject->name ?? null;
 
-        if (is_null($taxonomy)) {
+        if (!is_null($taxonomy)) {
             $archiveUrl = get_term_link($queriedObject);
         } else {
             $archiveUrl = get_post_type_archive_link($postType);
