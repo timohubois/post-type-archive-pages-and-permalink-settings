@@ -54,7 +54,7 @@ final class WordPress
         return $rules;
     }
 
-    public function handle404()
+    public function handle404(): void
     {
         if (is_404()) {
             $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
