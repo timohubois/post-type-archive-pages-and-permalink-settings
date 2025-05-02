@@ -3,7 +3,7 @@ Contributors: timohubois
 Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.0
 Tested up to: 6.8
-Stable tag: 1.9.0.1
+Stable tag: 2.0.0
 Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -91,6 +91,9 @@ Regular not but if you have any trouble it's a good practice to resave your perm
 This ensures that WordPress regenerates its rewrite rules with your new settings.
 
 == Changelog ==
+= 2.0.0 =
+* improve Yoast SEO compatibility
+
 = 1.9.0.1 =
 * don't create critical error on handle next and previous rel links (Yoast SEO compatibility)
 
