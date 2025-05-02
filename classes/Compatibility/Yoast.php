@@ -90,10 +90,17 @@ final class Yoast
             return $canonical;
         }
 
-        // Always return the current paginated/filter URL as canonical
+        $queriedObject = get_queried_object();
+        $taxonomy = $queriedObject->taxonomy ?? null;
+        $postType = $taxonomy ? get_taxonomy($taxonomy)->object_type[0] : ($queriedObject->name ?? null);
+
+        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+        if (!isset($optionsReadingPostTypes[$postType])) {
+            return $canonical;
+        }
+
         global $wp;
         $url = home_url(add_query_arg($wp->query_vars, $wp->request));
-        // If using pretty permalinks, you may need to reconstruct the URL as in your getQueriedArchiveUrl
         return $this->getQueriedArchiveUrl($url);
     }
 
@@ -103,12 +110,30 @@ final class Yoast
             return $link;
         }
 
+        $queriedObject = get_queried_object();
+        $taxonomy = $queriedObject->taxonomy ?? null;
+        $postType = $taxonomy ? get_taxonomy($taxonomy)->object_type[0] : ($queriedObject->name ?? null);
+
+        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+        if (!isset($optionsReadingPostTypes[$postType])) {
+            return $link;
+        }
+
         return $this->fixRelLink($link);
     }
 
     public function wpseoPrevRelLink(string $link): string
     {
         if (!is_post_type_archive() && !is_tax()) {
+            return $link;
+        }
+
+        $queriedObject = get_queried_object();
+        $taxonomy = $queriedObject->taxonomy ?? null;
+        $postType = $taxonomy ? get_taxonomy($taxonomy)->object_type[0] : ($queriedObject->name ?? null);
+
+        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+        if (!isset($optionsReadingPostTypes[$postType])) {
             return $link;
         }
 
@@ -122,6 +147,15 @@ final class Yoast
         }
 
         if (!is_post_type_archive() && !is_tax()) {
+            return $url;
+        }
+
+        $queriedObject = get_queried_object();
+        $taxonomy = $queriedObject->taxonomy ?? null;
+        $postType = $taxonomy ? get_taxonomy($taxonomy)->object_type[0] : ($queriedObject->name ?? null);
+
+        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+        if (!isset($optionsReadingPostTypes[$postType])) {
             return $url;
         }
 
