@@ -86,14 +86,12 @@ final class Yoast
 
     public function wpseoCanonical(string $canonical): string
     {
-        if (is_post_type_archive()) {
-            $postType = get_post_type();
-            return get_post_type_archive_link($postType);
+        if (!empty($canonical)) {
+            return $canonical;
         }
 
-        if (is_tax()) {
-            $taxonomy = get_taxonomy(get_queried_object()->taxonomy);
-            return get_term_link(get_queried_object(), $taxonomy);
+        if (is_post_type_archive() || is_tax()) {
+            return $this->getArchiveUrl($canonical);
         }
 
         return $canonical;
@@ -115,9 +113,29 @@ final class Yoast
             return $link;
         }
 
+        $urlFromLink = explode('href="', $link);
+        $urlFromLink = $urlFromLink[1];
+        $urlFromLink = explode('"', $urlFromLink);
+        $urlFromLink = $urlFromLink[0];
+
+        if (empty($urlFromLink)) {
+            return $link;
+        }
+
+        $newUrl = $this->getArchiveUrl($urlFromLink);
+
+        if ($newUrl === $urlFromLink) {
+            return $link;
+        }
+
+        return preg_replace('/href="[^"]*"/', 'href="' . $newUrl . '"', $link);
+    }
+
+    private function getArchiveUrl(string $url): string
+    {
         $queriedObject = get_queried_object();
         if (is_null($queriedObject)) {
-            return $link;
+            return $url;
         }
 
         $taxonomy = $queriedObject->taxonomy ?? null;
@@ -130,40 +148,26 @@ final class Yoast
         }
 
         // Remove all existing query params from the archive url, they get may added later.
-        $pageArchiveUrl = parse_url($archiveUrl);
-        unset($pageArchiveUrl['query']);
-        $archiveUrl = $pageArchiveUrl['scheme'] . '://' . $pageArchiveUrl['host'] . $pageArchiveUrl['path'];
+        $archiveUrl = parse_url($archiveUrl);
+        unset($archiveUrl['query']);
+        $archiveUrl = $archiveUrl['scheme'] . '://' . $archiveUrl['host'] . $archiveUrl['path'];
         $archiveUrl = rtrim($archiveUrl, '/');
 
         $wp_rewrite = new WP_Rewrite();
         $pagedPaginationBase = $wp_rewrite->pagination_base;
         $pagedPaginationBase = untrailingslashit($pagedPaginationBase);
 
-        $hasLinkPaginationBase = strpos($link, $pagedPaginationBase) !== false;
-        if (!$hasLinkPaginationBase) {
-            return $link;
+        $pageNumberFromUrl = explode($pagedPaginationBase . '/', $url);
+        $pageNumberFromUrl = (int)$pageNumberFromUrl[count($pageNumberFromUrl) - 1];
+
+        $isUrlPaged = $pageNumberFromUrl > 0;
+        if ($isUrlPaged) {
+            $newLink = trailingslashit($archiveUrl) . trailingslashit($pagedPaginationBase) . $pageNumberFromUrl;
+        } else {
+            $newLink = trailingslashit($archiveUrl);
         }
 
-        $hrefFromLink = explode('href="', $link);
-        $hrefFromLink = $hrefFromLink[1];
-        $hrefFromLink = explode('"', $hrefFromLink);
-        $hrefFromLink = $hrefFromLink[0];
-
-        if (empty($hrefFromLink)) {
-            return $link;
-        }
-
-        $pageNumberFromLink = explode($pagedPaginationBase . '/', $hrefFromLink);
-        $pageNumberFromLink = (int)$pageNumberFromLink[count($pageNumberFromLink) - 1];
-
-        if ($pageNumberFromLink <= 0) {
-            return $link;
-        }
-
-        $pagedArchiveUrl = trailingslashit($archiveUrl) . trailingslashit($pagedPaginationBase) . $pageNumberFromLink;
-        $pagedArchiveUrl = $this->maybeAddQueryStringToUrl($pagedArchiveUrl);
-
-        return preg_replace('/href="[^"]*"/', 'href="' . $pagedArchiveUrl . '"', $link);
+        return $this->maybeAddQueryStringToUrl($newLink);
     }
 
     private function maybeAddQueryStringToUrl(string $link): string
