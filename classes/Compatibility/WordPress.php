@@ -43,7 +43,7 @@ final class WordPress
             if ($taxonomySlug) {
                 $filteredRules = array_filter(
                     $rules,
-                    static fn ($key): bool => str_starts_with($key, $taxonomySlug),
+                    static fn($key): bool => str_starts_with($key, $taxonomySlug),
                     ARRAY_FILTER_USE_KEY
                 );
                 $nonMatchingRules = array_diff_key($rules, $filteredRules);
@@ -95,8 +95,8 @@ final class WordPress
             return $title;
         }
 
-        if (is_archive() && !is_tax()) {
-            $title = self::updateCustomArchiveTitle($title);
+        if (is_post_type_archive() || is_archive() && !is_tax()) {
+            return self::updateCustomArchiveTitle($title);
         }
 
         if (is_tax()) {
@@ -108,7 +108,8 @@ final class WordPress
 
     private static function updateCustomArchiveTitle(string $title): string
     {
-        $queriedObject = get_queried_object();
+        $postType = get_query_var('post_type') ?: 'post';
+        $queriedObject = get_post_type_object($postType);
         $postType = $queriedObject->name ?? null;
         $postTypeArchivePageId = OptionsReadingPostTypes::getInstance()->getOptions()[$postType] ?? null;
 
