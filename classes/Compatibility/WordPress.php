@@ -95,15 +95,43 @@ final class WordPress
             return $title;
         }
 
-        if (is_post_type_archive() || is_archive() && !is_tax()) {
+        // If we have a post_type query parameter, it's a taxonomy page filtered by post type
+        if (is_tax() && isset($_GET['post_type'])) {
+            return self::updateTaxonomyTitle($title);
+        }
+
+        // If we have a taxonomy query parameter, it's a post type archive filtered by taxonomy
+        if (is_post_type_archive() && self::hasTaxonomyFilter()) {
             return self::updateCustomArchiveTitle($title);
         }
 
+        // Standard taxonomy pages (without post_type filter)
         if (is_tax()) {
             return self::updateTaxonomyTitle($title);
         }
 
+        // Standard post type archives (without taxonomy filter)
+        if (is_post_type_archive() || (is_archive() && !is_tax())) {
+            return self::updateCustomArchiveTitle($title);
+        }
+
         return $title;
+    }
+
+    /**
+     * Check if there's a taxonomy filter in the query parameters
+     */
+    private static function hasTaxonomyFilter(): bool
+    {
+        $taxonomyOptions = OptionsPermalinksTaxonomies::getInstance()->getOptions() ?: [];
+
+        foreach (array_keys($taxonomyOptions) as $taxonomy) {
+            if (isset($_GET[$taxonomy])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static function updateCustomArchiveTitle(string $title): string
@@ -123,7 +151,13 @@ final class WordPress
     private static function updateTaxonomyTitle(string $title): string
     {
         $queriedObject = get_queried_object();
-        $taxonomy = $queriedObject->taxonomy ?? null;
+
+        // Ensure we have a valid taxonomy object
+        if (!$queriedObject || !isset($queriedObject->taxonomy) || !isset($queriedObject->name)) {
+            return $title;
+        }
+
+        $taxonomy = $queriedObject->taxonomy;
         $taxonomyPermalinkOption = OptionsPermalinksTaxonomies::getInstance()->getOptions()[$taxonomy] ?? null;
 
         if ($taxonomyPermalinkOption) {
