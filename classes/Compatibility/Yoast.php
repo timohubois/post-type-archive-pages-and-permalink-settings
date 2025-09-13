@@ -165,7 +165,7 @@ final class Yoast
 
         // If rel=prev and not paged, do not output a prev URL
         if ($rel === 'prev' && !$isPaged) {
-            return null;
+            return '';
         }
 
         // Only reconstruct for rel=prev on page 2 if $url is empty so that archive link is used.
@@ -182,7 +182,7 @@ final class Yoast
         }
 
         if (empty($url)) {
-            return null;
+            return '';
         }
 
         return $this->getQueriedArchiveUrl($url);
