@@ -436,6 +436,10 @@ final class Wpml
     public function redirectTo404IfArchivePageNotFoundInCurrentLanguage(): void
     {
 
+        if (is_search()) {
+            return;
+        }
+
         global $wp_query;
         global $wp;
 
