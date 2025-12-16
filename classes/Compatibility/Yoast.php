@@ -243,7 +243,7 @@ final class Yoast
 
         $isUrlPaged = $pageNumberFromUrl > 0;
         if ($isUrlPaged) {
-            $newLink = trailingslashit($archiveUrl) . trailingslashit($pagedPaginationBase) . $pageNumberFromUrl;
+            $newLink = trailingslashit(trailingslashit($archiveUrl) . $pagedPaginationBase . '/' . $pageNumberFromUrl);
         } else {
             $newLink = trailingslashit($archiveUrl);
         }
