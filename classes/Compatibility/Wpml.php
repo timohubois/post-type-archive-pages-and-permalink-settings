@@ -443,7 +443,10 @@ final class Wpml
         global $wp_query;
         global $wp;
 
-        $queriedPostType = $wp_query->query_vars['post_type'];
+        $queriedPostType = $wp_query->query_vars['post_type'] ?? null;
+        if (!is_string($queriedPostType) || $queriedPostType === '') {
+            return;
+        }
 
         $isPostTypeArchive = is_post_type_archive($queriedPostType);
         if (!$isPostTypeArchive) {

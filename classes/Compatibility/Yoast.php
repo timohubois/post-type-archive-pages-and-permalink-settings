@@ -192,7 +192,7 @@ final class Yoast
         if ($rel === 'prev' && $paged === 2 && (!$url || $url === '')) {
             if ($taxonomy) {
                 $url = get_term_link($queriedObject);
-            } else {
+            } elseif ($postType) {
                 $url = get_post_type_archive_link($postType);
             }
         }
@@ -241,8 +241,10 @@ final class Yoast
 
         if ($taxonomy) {
             $archiveUrl = get_term_link($queriedObject);
-        } else {
+        } elseif ($postType) {
             $archiveUrl = get_post_type_archive_link($postType);
+        } else {
+            return $originalUrl;
         }
 
         // Remove all existing query params from the archive url, they get may added later.
