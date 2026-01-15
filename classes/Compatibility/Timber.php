@@ -16,10 +16,15 @@ final class Timber
     public static function maybeAddArchivePageToContext(array $context): array
     {
         $queriedObject = get_queried_object();
-        $taxonomy = $queriedObject->taxonomy ?? null;
-        $postType = get_taxonomy($taxonomy)->object_type[0] ?? $queriedObject->name ?? null;
+        if ($queriedObject === null) {
+            return $context;
+        }
 
-        $postTypeArchivePageId = OptionsReadingPostTypes::getInstance()->getOptions()[$postType] ?? null;
+        $taxonomy = $queriedObject->taxonomy ?? null;
+        $taxonomyObject = $taxonomy ? get_taxonomy($taxonomy) : false;
+        $postType = $taxonomyObject ? $taxonomyObject->object_type[0] : ($queriedObject->name ?? null);
+
+        $postTypeArchivePageId = OptionsReadingPostTypes::getInstance()->getOptions()[$postType ?? ''] ?? null;
 
         if ($postTypeArchivePageId) {
             $context['post'] = \Timber\Timber::get_post($postTypeArchivePageId);
