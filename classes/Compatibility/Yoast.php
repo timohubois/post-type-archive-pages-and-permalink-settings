@@ -91,11 +91,16 @@ final class Yoast
         }
 
         $queriedObject = get_queried_object();
+        if ($queriedObject === null) {
+            return $canonical;
+        }
+
         $taxonomy = $queriedObject->taxonomy ?? null;
-        $postType = $taxonomy ? get_taxonomy($taxonomy)->object_type[0] : ($queriedObject->name ?? null);
+        $taxonomyObject = $taxonomy ? get_taxonomy($taxonomy) : false;
+        $postType = $taxonomyObject ? $taxonomyObject->object_type[0] : ($queriedObject->name ?? null);
 
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-        if (!isset($optionsReadingPostTypes[$postType])) {
+        if (!isset($optionsReadingPostTypes[$postType ?? ''])) {
             return $canonical;
         }
 
@@ -111,11 +116,16 @@ final class Yoast
         }
 
         $queriedObject = get_queried_object();
+        if ($queriedObject === null) {
+            return $link;
+        }
+
         $taxonomy = $queriedObject->taxonomy ?? null;
-        $postType = $taxonomy ? get_taxonomy($taxonomy)->object_type[0] : ($queriedObject->name ?? null);
+        $taxonomyObject = $taxonomy ? get_taxonomy($taxonomy) : false;
+        $postType = $taxonomyObject ? $taxonomyObject->object_type[0] : ($queriedObject->name ?? null);
 
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-        if (!isset($optionsReadingPostTypes[$postType])) {
+        if (!isset($optionsReadingPostTypes[$postType ?? ''])) {
             return $link;
         }
 
@@ -129,11 +139,16 @@ final class Yoast
         }
 
         $queriedObject = get_queried_object();
+        if ($queriedObject === null) {
+            return $link;
+        }
+
         $taxonomy = $queriedObject->taxonomy ?? null;
-        $postType = $taxonomy ? get_taxonomy($taxonomy)->object_type[0] : ($queriedObject->name ?? null);
+        $taxonomyObject = $taxonomy ? get_taxonomy($taxonomy) : false;
+        $postType = $taxonomyObject ? $taxonomyObject->object_type[0] : ($queriedObject->name ?? null);
 
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-        if (!isset($optionsReadingPostTypes[$postType])) {
+        if (!isset($optionsReadingPostTypes[$postType ?? ''])) {
             return $link;
         }
 
@@ -151,11 +166,16 @@ final class Yoast
         }
 
         $queriedObject = get_queried_object();
+        if ($queriedObject === null) {
+            return $url;
+        }
+
         $taxonomy = $queriedObject->taxonomy ?? null;
-        $postType = $taxonomy ? get_taxonomy($taxonomy)->object_type[0] : ($queriedObject->name ?? null);
+        $taxonomyObject = $taxonomy ? get_taxonomy($taxonomy) : false;
+        $postType = $taxonomyObject ? $taxonomyObject->object_type[0] : ($queriedObject->name ?? null);
 
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-        if (!isset($optionsReadingPostTypes[$postType])) {
+        if (!isset($optionsReadingPostTypes[$postType ?? ''])) {
             return $url;
         }
 
@@ -170,10 +190,6 @@ final class Yoast
 
         // Only reconstruct for rel=prev on page 2 if $url is empty so that archive link is used.
         if ($rel === 'prev' && $paged === 2 && (!$url || $url === '')) {
-            $queriedObject = get_queried_object();
-            $taxonomy = $queriedObject->taxonomy ?? null;
-            $postType = $taxonomy ? get_taxonomy($taxonomy)->object_type[0] : ($queriedObject->name ?? null);
-
             if ($taxonomy) {
                 $url = get_term_link($queriedObject);
             } else {
@@ -220,9 +236,10 @@ final class Yoast
         }
 
         $taxonomy = $queriedObject->taxonomy ?? null;
-        $postType = get_taxonomy($taxonomy)->object_type[0] ?? $queriedObject->name ?? null;
+        $taxonomyObject = $taxonomy ? get_taxonomy($taxonomy) : false;
+        $postType = $taxonomyObject ? $taxonomyObject->object_type[0] : ($queriedObject->name ?? null);
 
-        if (!is_null($taxonomy)) {
+        if ($taxonomy) {
             $archiveUrl = get_term_link($queriedObject);
         } else {
             $archiveUrl = get_post_type_archive_link($postType);
