@@ -139,10 +139,13 @@ final class WordPress
         $postType = get_query_var('post_type') ?: 'post';
         $queriedObject = get_post_type_object($postType);
         $postType = $queriedObject->name ?? null;
-        $postTypeArchivePageId = OptionsReadingPostTypes::getInstance()->getOptions()[$postType] ?? null;
+        $postTypeArchivePageId = OptionsReadingPostTypes::getInstance()->getOptions()[$postType ?? ''] ?? null;
 
         if ($postTypeArchivePageId) {
-            return esc_attr(get_post($postTypeArchivePageId)->post_title);
+            $archivePage = get_post($postTypeArchivePageId);
+            if ($archivePage !== null) {
+                return esc_attr($archivePage->post_title);
+            }
         }
 
         return $title;
@@ -263,8 +266,12 @@ final class WordPress
         }
 
         $queriedObject = get_queried_object();
+        if ($queriedObject === null) {
+            return;
+        }
+
         $postType = $queriedObject->name ?? null;
-        $postTypeArchivePageId = OptionsReadingPostTypes::getInstance()->getOptions()[$postType] ?? null;
+        $postTypeArchivePageId = OptionsReadingPostTypes::getInstance()->getOptions()[$postType ?? ''] ?? null;
         if ($postTypeArchivePageId) {
             $editPostLink = get_edit_post_link($postTypeArchivePageId);
             $wpAdminBar->add_menu(
