@@ -84,7 +84,7 @@ final class Yoast
         }
     }
 
-    public function wpseoCanonical(string $canonical): string
+    public function wpseoCanonical(?string $canonical): ?string
     {
         if (!is_post_type_archive() && !is_tax()) {
             return $canonical;
