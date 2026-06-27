@@ -23,12 +23,12 @@ final class SetArchivesAndSlugs
             $postTypeArchivePageId = $optionsReadingPostTypes[$postType];
 
             $args['has_archive'] = get_page_uri($postTypeArchivePageId);
-            $args['rewrite']['slug'] = get_page_uri($postTypeArchivePageId);
+            $args = $this->setRewriteSlug($args, get_page_uri($postTypeArchivePageId));
         }
 
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
         if (!empty($optionsPermalinksPostTypes[$postType])) {
-            $args['rewrite']['slug'] = $optionsPermalinksPostTypes[$postType];
+            $args = $this->setRewriteSlug($args, $optionsPermalinksPostTypes[$postType]);
         }
 
         return $args;
@@ -38,8 +38,19 @@ final class SetArchivesAndSlugs
     {
         $optionsPermalinksTaxonomies = OptionsPermalinksTaxonomies::getInstance()->getOptions();
         if (!empty($optionsPermalinksTaxonomies[$taxonomy])) {
-            $args['rewrite']['slug'] = $optionsPermalinksTaxonomies[$taxonomy];
+            $args = $this->setRewriteSlug($args, $optionsPermalinksTaxonomies[$taxonomy]);
         }
+
+        return $args;
+    }
+
+    private function setRewriteSlug(array $args, string $slug): array
+    {
+        if (!isset($args['rewrite']) || !is_array($args['rewrite'])) {
+            $args['rewrite'] = [];
+        }
+
+        $args['rewrite']['slug'] = $slug;
 
         return $args;
     }

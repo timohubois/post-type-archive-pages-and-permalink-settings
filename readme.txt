@@ -3,7 +3,7 @@ Contributors: timohubois
 Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.0
 Tested up to: 7.0
-Stable tag: 2.2.4
+Stable tag: 2.2.5
 Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -91,6 +91,9 @@ Regular not but if you have any trouble it's a good practice to resave your perm
 This ensures that WordPress regenerates its rewrite rules with your new settings.
 
 == Changelog ==
+= 2.2.5 =
+* fix PHP deprecation when setting permalinks for post types or taxonomies with disabled rewrites
+
 = 2.2.4 =
 * fix Yoast SEO canonical compatibility when no canonical URL is provided
 
