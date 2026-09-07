@@ -33,7 +33,9 @@ final class Plugin
             $className = $namespace . '\\' . basename($filename, '.php');
 
             if (class_exists($className)) {
-                $instances[] = new $className();
+                $instances[] = is_callable([$className, 'getInstance'])
+                    ? $className::getInstance()
+                    : new $className();
             } else {
                 error_log('Class ' . $className . ' does not exist.');
             }
