@@ -82,8 +82,31 @@ final class OptionsReadingPostTypes
 
         register_setting(
             'reading',
-            $optionName
+            $optionName,
+            [
+                'type' => 'array',
+                'sanitize_callback' => [self::class, 'sanitizeOptions'],
+                'default' => [],
+            ]
         );
+    }
+
+    public static function sanitizeOptions(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $sanitized = [];
+        foreach ($value as $postType => $pageId) {
+            if (!is_scalar($pageId)) {
+                continue;
+            }
+
+            $sanitized[sanitize_key((string) $postType)] = absint($pageId);
+        }
+
+        return $sanitized;
     }
 
     public function renderSettings(): void
@@ -119,7 +142,7 @@ final class OptionsReadingPostTypes
                         [
                             'name' => esc_attr(sprintf('%s[%s]', $optionName, $postType->name)),
                             'echo' => 1,
-                            'show_option_none' => esc_attr__('&mdash; Select &mdash;'),
+                            'show_option_none' => esc_attr__('&mdash; Select &mdash;', 'post-type-archive-pages-and-permalink-settings'),
                             'option_none_value' => '',
                             'selected' => esc_attr($selected)
                         ]

@@ -77,21 +77,8 @@ final class OptionsPermalinksTaxonomies
                 return;
             }
 
-            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized --sanitized below
-            $array = wp_unslash($_POST[self::OPTION_NAME]);
-
-            $keys = array_keys($array);
-            $keys = array_map('sanitize_key', $keys);
-
-            $values = array_values($array);
-            $values = array_map('sanitize_text_field', $values);
-
-            // Remove trailing slashes from values.
-            $values = array_map(function ($value): string {
-                return trim($value, '/');
-            }, $values);
-
-            $optionValue = array_combine($keys, $values);
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitizeOptions().
+            $optionValue = self::sanitizeOptions(wp_unslash($_POST[self::OPTION_NAME]));
 
             update_option(self::OPTION_NAME, $optionValue);
         }
@@ -106,8 +93,31 @@ final class OptionsPermalinksTaxonomies
 
         register_setting(
             'permalink',
-            self::OPTION_NAME
+            self::OPTION_NAME,
+            [
+                'type' => 'array',
+                'sanitize_callback' => [self::class, 'sanitizeOptions'],
+                'default' => [],
+            ]
         );
+    }
+
+    public static function sanitizeOptions(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $sanitized = [];
+        foreach ($value as $taxonomy => $slug) {
+            if (!is_scalar($slug)) {
+                continue;
+            }
+
+            $sanitized[sanitize_key((string) $taxonomy)] = trim(sanitize_text_field((string) $slug), '/');
+        }
+
+        return $sanitized;
     }
 
     public function renderOptionsSettingsField(): void

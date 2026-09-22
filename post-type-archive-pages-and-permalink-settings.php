@@ -10,7 +10,6 @@
  * Author:            Timo Hubois
  * Author URI:        https://pixelsaft.wtf
  * Text Domain:       post-type-archive-pages-and-permalink-settings
- * Domain Path:       /languages
  * License:           GPLv3 or later
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -49,7 +48,6 @@ if (!file_exists(plugin_dir_path(PTATAP_PLUGIN_FILE) . 'vendor/autoload.php')) {
     });
 }
 
-load_plugin_textdomain(PTATAP_PLUGIN_FILE);
 
 register_activation_hook(PTATAP_PLUGIN_FILE, [Plugin::class, 'onPluginActivation']);
 register_deactivation_hook(PTATAP_PLUGIN_FILE, [Plugin::class, 'onPluginDeactivation']);

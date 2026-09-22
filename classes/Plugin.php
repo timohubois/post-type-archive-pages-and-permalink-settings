@@ -36,8 +36,6 @@ final class Plugin
                 $instances[] = is_callable([$className, 'getInstance'])
                     ? $className::getInstance()
                     : new $className();
-            } else {
-                error_log('Class ' . $className . ' does not exist.');
             }
         }
 
