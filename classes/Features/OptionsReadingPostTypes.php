@@ -103,7 +103,7 @@ final class OptionsReadingPostTypes
                 continue;
             }
 
-            $sanitized[sanitize_key((string) $postType)] = absint($pageId);
+            $sanitized[sanitize_key((string) $postType)] = $pageId === '' ? '' : absint($pageId);
         }
 
         return $sanitized;

@@ -16,6 +16,7 @@ final class Wpml
         if (self::isWpmlActive()) {
             // Modifies the stored options for the post type archive pages based on the current language.
             add_filter('ptatap_post_type_reading_settings', [$this, 'setTranslatedPostTypeReadingSettings'], 10, 1);
+            add_filter('wp_dropdown_pages', [$this, 'addMissingTranslationToArchivePageDropdown'], 10, 2);
 
             add_filter('init', [$this, 'setPostTypeTranslationStrings'], 10);
             add_filter('init', [$this, 'setTaxonomyTranslationStrings'], 15);
@@ -40,6 +41,45 @@ final class Wpml
         }
 
         return is_plugin_active('sitepress-multilingual-cms/sitepress.php');
+    }
+
+    public function addMissingTranslationToArchivePageDropdown(string $output, array $args): string
+    {
+        $name = $args['name'] ?? '';
+        $selectedPageId = absint($args['selected'] ?? 0);
+        $optionNamePrefix = OptionsReadingPostTypes::OPTION_NAME . '[';
+
+        if (!str_starts_with($name, $optionNamePrefix) || !$selectedPageId) {
+            return $output;
+        }
+
+        if (str_contains($output, sprintf('value="%d"', $selectedPageId))) {
+            return $output;
+        }
+
+        $currentLanguage = apply_filters('wpml_current_language', null);
+        $defaultLanguage = apply_filters('wpml_default_language', null);
+
+        if (!is_string($currentLanguage) || $currentLanguage === 'all' || $currentLanguage === $defaultLanguage) {
+            return $output;
+        }
+
+        $translatedPageId = apply_filters('wpml_object_id', $selectedPageId, 'page', false, $currentLanguage);
+        $pageTitle = get_the_title($selectedPageId);
+
+        if ($translatedPageId || $pageTitle === '') {
+            return $output;
+        }
+
+        /* translators: %s: Title of the archive page. */
+        $optionLabel = sprintf(__('%s — translation missing', 'post-type-archive-pages-and-permalink-settings'), $pageTitle);
+        $option = sprintf(
+            '<option value="%1$d" selected="selected">%2$s</option>',
+            $selectedPageId,
+            esc_html($optionLabel)
+        );
+
+        return str_replace('</select>', $option . '</select>', $output);
     }
 
     public function setTranslatedPostTypeReadingSettings(array|bool $postTypeReadingSettings): array|bool
