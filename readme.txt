@@ -3,7 +3,7 @@ Contributors: timohubois
 Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.5
 Tested up to: 7.1
-Stable tag: 2.2.7
+Stable tag: 2.2.8
 Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -91,6 +91,10 @@ Regular not but if you have any trouble it's a good practice to resave your perm
 This ensures that WordPress regenerates its rewrite rules with your new settings.
 
 == Changelog ==
+= 2.2.8 =
+* Show and preserve assigned archive pages when their WPML translation is missing.
+* Improve settings sanitization, request handling, and translation compatibility.
+
 = 2.2.7 =
 * Raise the minimum supported WordPress version to 6.5.
 
