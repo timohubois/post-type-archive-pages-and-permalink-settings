@@ -82,8 +82,11 @@ final class WordPress
 
                 $postTypeArchivePageUri = get_page_uri($postTypeArchivePageId);
                 if (str_ends_with($requestUri, $postTypeSlug) || str_ends_with($requestUri, $postTypeArchivePageUri)) {
-                    wp_redirect(get_post_type_archive_link($postType), 301);
-                    exit;
+                    $archiveUrl = get_post_type_archive_link($postType);
+                    if ($archiveUrl !== false) {
+                        wp_safe_redirect($archiveUrl, 301);
+                        exit;
+                    }
                 }
             }
         }

@@ -229,7 +229,7 @@ final class Yoast
         }
 
         // Remove all existing query params from the archive url, they get may added later.
-        $archiveUrl = parse_url($archiveUrl);
+        $archiveUrl = wp_parse_url($archiveUrl);
         unset($archiveUrl['query']);
         $archiveUrl = $archiveUrl['scheme'] . '://' . $archiveUrl['host'] . $archiveUrl['path'];
         $archiveUrl = rtrim($archiveUrl, '/');
@@ -275,8 +275,8 @@ final class Yoast
         $postTypeObject = get_post_type_object($postType);
         $yoastSettingsPageUrl = admin_url('admin.php?page=wpseo_page_settings#/post-type/' . $slug);
         $message = sprintf(
-            /* translators %1$s: open <a> tag, %2$s: post type name, %3$s: close </a> tag, %4$s: open <strong> tag, %5$s: post type name, %6$s: archive, %7$s: close </strong> tag */
-            __('Change settings at %1$sYoast SEO > Content Types > %2$s%3$s at the %4$s %5$s %6$s %7$s section.', 'flynt'),
+            /* translators: %1$s: open <a> tag, %2$s: post type name, %3$s: close </a> tag, %4$s: open <strong> tag, %5$s: post type name, %6$s: archive, %7$s: close </strong> tag. */
+            __('Change settings at %1$sYoast SEO > Content Types > %2$s%3$s at the %4$s %5$s %6$s %7$s section.', 'post-type-archive-pages-and-permalink-settings'),
             sprintf("<a href='%s' target='_blank' rel='noopener noreferrer'>", $yoastSettingsPageUrl),
             $postTypeObject->labels->name,
             "</a>",
@@ -288,8 +288,8 @@ final class Yoast
 
         if (\Ptatap\Compatibility\WPML::isWpmlActive()) {
             $message .= ' ' . sprintf(
-                /* translators %1$s: open <a> tag, %2$s: close </a> tag */
-                __('And then translate them at %1$sWPML String Translation%2$s page (Domain: admin_texts_wpseo_titles).', 'flynt'),
+                /* translators: %1$s: open <a> tag, %2$s: close </a> tag. */
+                __('And then translate them at %1$sWPML String Translation%2$s page (Domain: admin_texts_wpseo_titles).', 'post-type-archive-pages-and-permalink-settings'),
                 sprintf("<a href='%s' target='_blank' rel='noopener noreferrer'>", admin_url('admin.php?page=wpml-string-translation/menu/string-translation.php&strings_per_page=100&context=admin_texts_wpseo_titles')),
                 "</a>"
             );
