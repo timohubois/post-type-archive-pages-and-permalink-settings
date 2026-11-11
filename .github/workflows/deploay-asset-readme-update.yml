@@ -1,14 +1,13 @@
-name: Plugin asset/readme update
+name: Publish listing assets and readme
 on:
-  push:
-    branches:
-    - trunk
+  workflow_dispatch:
 permissions:
   contents: read
 
 jobs:
-  trunk:
-    name: Push to trunk
+  publish-listing:
+    name: Publish listing assets and readme
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
