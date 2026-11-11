@@ -1,4 +1,4 @@
-===  PTAPS - Post Type Archive Pages and Permalink Settings  ===
+=== PTAPS - Post Type Archive Pages and Permalink Settings ===
 Contributors: timohubois
 Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.5
@@ -8,87 +8,102 @@ Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Use archive pages for custom post types and improve WordPress SEO by managing permalinks for custom post types and taxonomies.
+Choose archive pages for custom post types and manage URL bases for custom post types and taxonomies in native WordPress settings.
 
 == Description ==
 
-Select a regular page that should interact as archive for custom post types and allows to change the slug for custom post type single pages or custom taxonomies.
+Want your Projects archive to live at the address of an existing page, with individual projects underneath it? PTAPS - Post Type Archive Pages and Permalink Settings connects your custom post types to regular WordPress pages and gives you control over their URL bases.
 
-The Plugin integrates seamlessly with **Reading** and **Permalinks** settings:
+Choose a page under **Settings > Reading**. Its path becomes the post type's archive address and the default base for individual entries. For example, a page at /projects/ can provide the archive address, with individual entries at /projects/example-project/ on a site using post-name permalinks without an additional front prefix.
 
-* Settings > **Reading** > Choose a page to as the archive for each custom post type.
-* Settings > **Permalinks** > Easily modify slugs for custom post types and taxonomies, where by default the selected archive page from **Reading** settings is used as base slug.
+Need a different base for individual entries or custom taxonomy terms? Set it under **Settings > Permalinks**. There is no separate settings dashboard to learn.
 
-Perfect for developers and site owners looking to optimize their WordPress site structure and improve SEO.
+**Features**
 
-== Key Features ==
+* Assign an existing page to each public custom post type, including a page nested under a parent.
+* Use the selected page's title for the post type archive through WordPress's archive-title filters.
+* Override the URL base for individual custom post type entries independently of the archive address.
+* Set URL bases for public custom taxonomies.
+* Add archive labels in the Pages list and update classic navigation-menu states for assigned pages.
+* Include targeted integrations for Yoast SEO, WPML and Timber. See the FAQs for their behavior and limits.
 
-* Custom archive page selection for post types to use any regular page as archive page
-* Flexible permalink customization of custom post types or custom taxonomies
-* More SEO-friendly URL structures
-* Easy integration with existing WordPress settings
-* Compatible with YOAST, WPML and Timber
+**Before you start**
 
-== Want to contribute? ==
-Check out the Plugin [GitHub Repository](https://github.com/timohubois/post-type-archive-pages-and-permalink-settings/).
+Your theme or another plugin must register the custom post types and taxonomies. PTAPS does not create content types, pages or archive layouts. The archive remains a post type archive rendered by your theme, not a normal page displaying its editor content automatically.
+
+URL changes can affect existing links. Try them on a staging site first, choose distinct bases and plan redirects for old URLs. Assign only pages intended for public archives; selecting a page is not an access-control mechanism.
 
 == Installation ==
 
-= INSTALL WITHIN WORDPRESS =
-(recommended)
+1. Ensure your site meets the WordPress and PHP requirements above and that your theme or another plugin registers public custom post types or taxonomies.
+2. In **Plugins > Add New**, search for **PTAPS - Post Type Archive Pages and Permalink Settings**, then install and activate it. Alternatively, upload the extracted plugin to /wp-content/plugins/post-type-archive-pages-and-permalink-settings/ and activate it. Composer is not required to run the plugin.
+3. Create and publish the pages you want to use as archive references. Choose a non-Plain permalink structure under **Settings > Permalinks** for path-based URLs.
+4. Open **Settings > Reading**, select a page for each desired custom post type under **Archive Pages**, and save changes.
+5. Optionally open **Settings > Permalinks** and enter bases under **Custom Post Types** or **Custom Taxonomies**. Save changes. Leave a base blank to use the selected archive page's path for a post type, or the registered default when no archive page is selected; a blank taxonomy base uses its registered default.
+6. Check the archive, individual entries, taxonomy terms and pagination. On multilingual sites, check each language too. Add redirects for any old URLs you need to preserve.
 
-1. Open **Plugins > Add new**
-2. Search for **Post Type and Taxonomy Archive Pages**
-3. Click **install and activate** the plugin
-
-= INSTALL MANUALLY THROUGH FTP =
-
-1. Download the plugin on the WordPress plugin page
-2. Upload the 'archive-pages-and-permalink-settings-for-post-types-and-taxonomies' folder to the /wp-content/plugins/ directory
-3. Activate the plugin through the 'Plugins' menu in WordPress
+Yoast SEO, WPML and Timber are optional, not required dependencies. Your theme still needs an appropriate archive template.
 
 == Frequently Asked Questions ==
 
-= How to programmatically get the post used as the archive page for a custom post type? =
+= Which post types and taxonomies appear in the settings? =
 
-An example can be found in the [GitHub Repository](https://github.com/timohubois/post-type-archive-pages-and-permalink-settings/).
+The settings list public, non-built-in post types and taxonomies registered on your site. WordPress's built-in posts, pages, categories and tags are not managed by these fields.
 
-= Is this plugin compatible with WPML? =
-The plugin works with WPML in the same as WPML interacts with WordPress. The archive page should be available in all languages (otherwise you get an 404) and it is not possible to select a archive page per language.
+A custom post type does not need an archive enabled beforehand: assigning a page sets its archive path. Saved settings can also enable URL rewrites where the original registration disabled them. If your theme or content-type plugin manages the same URLs, check for conflicting settings.
 
-= How do I set a custom archive page for a post type? =
-Go to Settings > Reading in your WordPress admin. You'll find a new section where you can select a specific page to act as the archive for each of your custom post types.
+= Does the selected page become a normal page with a list of posts? =
 
-= Can I change the URL structure for my custom post types? =
-Yes. Navigate to Settings > Permalinks in your admin panel. You'll see a new section where you can modify the slug for each custom post type.
+No. The page provides the archive path and title, while WordPress continues to serve a post type archive using your theme's archive template and query. The plugin does not insert a post list, copy page blocks into the archive or apply the selected page's page template automatically.
 
-= What about custom taxonomies - can I change their URLs too? =
-Absolutely. In the same Permalinks settings page, you'll find options to change the URL structure for your custom taxonomies.
+To display the page's content or custom fields on the archive, your theme must retrieve and render them. Developers can find a page-retrieval example in the [GitHub README](https://github.com/timohubois/post-type-archive-pages-and-permalink-settings/#how-to-programmatically-get-the-post-used-as-the-archive-page-for-a-custom-post-type).
 
-= Will this plugin automatically create new pages for my archives? =
-No, the plugin doesn't create new pages. It allows you to designate existing pages as archives for your custom post types. You need to create these pages yourself.
+= Can I use different bases for archives, individual entries and taxonomy terms? =
 
-= Does this work for all custom post types on my site? =
-The plugin supports all registered custom post types, including those created by themes or other plugins. However, it won't show options for post types that are not public or don't have archives enabled.
+Yes. The archive address follows the selected page's path. A non-empty **Custom Post Types** base overrides the base for individual entries without changing that archive address. **Custom Taxonomies** bases apply to term archive URLs; there is no page selector for taxonomy archives.
 
-= Is it possible to have different permalink structures for different post types? =
-Yes, the plugin allows you to set unique permalink structures for each custom post type and taxonomy independently.
+Enter a base such as projects or project-topics, not a full URL. These are base-slug settings, not a general permalink-template builder: substitution tags such as %year% or %category% in these fields are not supported. The final URL also depends on the content type's registered rewrite options and WordPress's permalink settings.
 
-= Why aren't my permalink changes taking effect? =
-If you notice that your permalink changes aren't reflecting on your site, try the following steps:
+= Will old URLs redirect automatically? =
 
-1. Go to Settings > Permalinks in your WordPress admin panel.
-2. Without making any changes, click the "Save Changes" button at the bottom of the page.
+Do not rely on that. The plugin has limited 404-to-archive handling for configured post type bases, but it does not provide a general redirect map for renamed archives, individual entries or taxonomy terms. Set up and verify redirects separately. Changing a base alone does not guarantee better search rankings.
 
-This action flushes the rewrite rules and often resolves issues with permalinks not updating. If the problem persists, try deactivating and reactivating the plugin, then save your permalinks again.
+= How does the Yoast SEO integration work? =
 
-= Do I need to update permalinks after changing archive pages or custom post type/taxonomy slugs? =
-Regular not but if you have any trouble it's a good practice to resave your permalinks after making changes to archive pages or modifying slugs. To do this:
+When Yoast SEO is active, the plugin adjusts canonical and pagination links for configured post type archives and related taxonomy archives. An editor notice explains that the assigned page's own Yoast settings do not control the post type archive. Configure archive metadata in Yoast SEO's content-type archive settings instead; exact menu labels depend on your Yoast version.
 
-1. Go to Settings > Permalinks
-2. Scroll to the bottom and click "Save Changes"
+= How does the WPML integration work? =
 
-This ensures that WordPress regenerates its rewrite rules with your new settings.
+The archive assignment is stored against the default-language page and uses its translations, rather than a separately selected archive page per language. Publish the assigned page in every language that needs an archive; a missing translation can cause a 404. The Reading dropdown preserves an existing assignment and marks it when its translation is missing.
+
+The integration also adjusts translated archive and entry links, language-switcher URLs and hreflang links, and registers configured URL-base strings with WPML. Use WPML String Translation where translated bases or Yoast metadata need translation. Check all configured languages after URL changes; this is not a blanket compatibility guarantee for every WPML setup.
+
+= How does the Timber integration work? =
+
+Through the timber/context filter, the plugin sets the context's post value to the assigned archive page when it resolves an associated post type. For taxonomy contexts it uses the taxonomy's first associated post type. Your Twig template must explicitly render the page fields or content you want to show and retain the archive's post-list query separately. The integration does not supply templates.
+
+= What should I check if a URL returns 404? =
+
+Save **Settings > Permalinks** once to regenerate WordPress's rewrite rules. The plugin also schedules a rewrite refresh when an archive assignment or an assigned page's slug, parent or status changes.
+
+If the issue persists, confirm that the content type is registered and public, the assigned page is published, and the base does not collide with another page, post type or taxonomy. Check your server's WordPress rewrite configuration and any conflicting permalink plugins. With WPML, confirm that the archive page's translation exists in the requested language.
+
+= Does an archive assignment restrict access to content? =
+
+No. Do not use an assigned page's password or visibility as protection for a public post type archive. Use appropriate WordPress permissions or a dedicated content-restriction solution, and verify access on the archive and individual entries separately.
+
+= What happens when I deactivate or delete the plugin? =
+
+Deactivation stops applying the archive and URL overrides and refreshes rewrite rules, but keeps the saved settings. Deleting the plugin removes its saved archive assignments and permalink settings, not your pages or custom posts. The registering theme or plugin then controls the original URLs again; review links and redirects before removing PTAPS.
+
+== Screenshots ==
+
+1. Choose existing pages for custom post type archives under Settings > Reading.
+2. Set bases for custom post type entries and custom taxonomy terms under Settings > Permalinks.
+
+== Want to contribute? ==
+
+Visit the [GitHub repository](https://github.com/timohubois/post-type-archive-pages-and-permalink-settings/) to report issues, view developer examples or contribute.
 
 == Changelog ==
 = 2.2.8 =
