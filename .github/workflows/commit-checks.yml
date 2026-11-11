@@ -22,6 +22,8 @@ jobs:
         key: ${{ runner.os }}-php8.3-composer-${{ hashFiles('composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php8.3-composer-
+    - name: Validate Composer files
+      run: composer validate --strict
     - name: Install dependencies
       run: |
         composer install --no-interaction --prefer-dist
