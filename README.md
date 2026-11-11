@@ -85,10 +85,6 @@ Composer development dependencies are not included in the release.
 
 Keep plugin code compatible with PHP 8.0 when using newer development tools.
 
-## WordPress.org listing assets
-
-Listing images live in `.wordpress-org/` (excluded from plugin ZIPs); captions are in `readme.txt`.
-
 ## License
 
 GPLv3
