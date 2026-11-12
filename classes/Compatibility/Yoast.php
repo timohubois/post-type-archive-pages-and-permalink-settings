@@ -275,7 +275,7 @@ final class Yoast
     private function getAdminNoticeTitle(): string
     {
         return __(
-            'Yoast SEO settings are not applied because this is a Custom Post Type archive page and they are handled different',
+            'Yoast SEO settings on this page do not apply to this post type archive.',
             'post-type-archive-pages-and-permalink-settings'
         );
     }
@@ -304,7 +304,7 @@ final class Yoast
             $message .= ' ' . sprintf(
                 /* translators: %1$s: open <a> tag, %2$s: close </a> tag. */
                 __(
-                    'And then translate them at %1$sWPML String Translation%2$s page (Domain: admin_texts_wpseo_titles).',
+                    'Then translate them at %1$sWPML String Translation%2$s (domain: admin_texts_wpseo_titles).',
                     'post-type-archive-pages-and-permalink-settings'
                 ),
                 sprintf(
