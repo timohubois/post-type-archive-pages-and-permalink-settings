@@ -27,6 +27,7 @@ final class Wpml
 
             add_filter('icl_ls_languages', [$this, 'setIcLsLanguages'], 10, 1);
             add_filter('wpml_ls_language_url', [$this, 'setWpmlLsLanguageUrls'], 10, 2);
+            add_filter('wpml_head_langs', [$this, 'setWpmlHeadLangs'], 10, 1);
             add_filter('wpml_alternate_hreflang', [$this, 'setWpmlAlternateHrefLang'], 10, 2);
 
             add_action('template_redirect', [$this, 'redirectTo404IfArchivePageNotFoundInCurrentLanguage'], 10);
@@ -448,6 +449,30 @@ final class Wpml
         return trailingslashit($url);
     }
 
+    public function setWpmlHeadLangs(array $languages): array
+    {
+        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
+
+        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
+            return $languages;
+        }
+
+        foreach ($optionsReadingPostTypes as $postType => $postId) {
+            if (!is_post_type_archive($postType) || empty($postId)) {
+                continue;
+            }
+
+            foreach ($languages as $key => $language) {
+                $translatedPageId = $this->getWpmlObjectId($postId, 'page', false, $language['code']);
+                if (!$translatedPageId) {
+                    unset($languages[$key]);
+                }
+            }
+        }
+
+        return $languages;
+    }
+
     public function setWpmlAlternateHrefLang(string $url, string $code): string
     {
 
@@ -463,7 +488,11 @@ final class Wpml
             }
 
             $returnOriginalIfMissing = false;
-            $wpmlObjectId = $this->getWpmlObjectId($postId, $postType, $returnOriginalIfMissing, $code);
+            $wpmlObjectId = $this->getWpmlObjectId($postId, 'page', $returnOriginalIfMissing, $code);
+            if (!$wpmlObjectId) {
+                return '';
+            }
+
             $pageUri = get_page_uri($wpmlObjectId);
             return trailingslashit(apply_filters('wpml_permalink', home_url($pageUri), $code));
         }
