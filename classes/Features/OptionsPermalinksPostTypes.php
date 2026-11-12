@@ -158,7 +158,7 @@ final class OptionsPermalinksPostTypes
                 $withFront = $post_type->rewrite['with_front'] ?? false;
 
                 $description = sprintf(
-                    'post-type: %1$s | has_archive: %2$s | with_front: %2$s',
+                    'post-type: %1$s | has_archive: %2$s | with_front: %3$s',
                     $post_type->name,
                     is_bool($hasArchive) ? ($hasArchive ? 'true' : 'false') : $hasArchive,
                     $withFront ? 'true' : 'false'
