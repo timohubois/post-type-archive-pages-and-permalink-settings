@@ -1,15 +1,38 @@
-# Post Type and Taxonomy Archive Pages Settings
+# PTAPS - Post Type Archive Pages and Permalink Settings
 
-Post Type and Taxonomy Archive Pages Settings enables to select a page that should interact as archive for custom post types. It also enables to change the slug for custom post type single pages or custom taxonomies.
+PTAPS - Post Type Archive Pages and Permalink Settings associates existing pages with custom post type archives and lets you set URL bases for custom post types and taxonomies through the native WordPress settings screens.
 
-The Plugin extends the native **Reading** and **Permalinks** settings pages:
+- **Settings > Reading:** select an existing page for each public custom post type's archive.
+- **Settings > Permalinks:** set single-post and taxonomy URL bases. A selected archive page's path supplies the default post type base unless you enter an override.
 
-* Settings > **Reading** > Adds a section to select a page which should interact as archive for a custom post type.
-* Settings > **Permalinks** > Adds a section to change the slug for custom post types and custom taxonomies.
+## Requirements
 
-## How to programmatically get the post used as the archive page for a custom post type?
+- WordPress 6.5 or later.
+- PHP 8.0 or later.
+- Public custom post types or taxonomies registered by your theme or another plugin.
+- Working WordPress pretty permalinks for the archive and slug settings.
 
-Example how to retrieve the post object of the page set as the archive for a custom post type:
+Composer is not required to run the plugin. Yoast SEO, WPML and Timber integrations are available when those plugins or libraries are present; they are not required for basic use.
+
+## Installation
+
+1. Clone this repository into `wp-content/plugins/post-type-archive-pages-and-permalink-settings/`.
+2. Activate **PTAPS - Post Type Archive Pages and Permalink Settings**.
+3. Create the pages you want to associate with your archives, then assign them under **Settings > Reading > Archive Pages** and save.
+4. If needed, set custom post type or taxonomy bases under **Settings > Permalinks** and save.
+5. Check archive, single-post and taxonomy links. If rules remain stale, save **Settings > Permalinks** once more to rebuild them.
+
+## Limitations
+
+The plugin does not create archive pages or register post types and taxonomies. It provides settings for public, non-built-in types and taxonomies. Your theme still controls archive rendering; assigning a page does not replace the archive template with the page template. Assigning a page enables its archive path even if no archive was enabled beforehand. Publish assigned pages; their passwords and visibility do not protect public archives. Permalink fields accept bases, not full URLs or templates such as `%year%`.
+
+Test URL changes on staging and review existing links and redirects before changing a public site. Changing a page's slug or parent can also change the associated archive path.
+
+With WPML, assign archive pages in the default language and provide their translations. Archive assignments are shared, not selected independently per language. Missing archive-page translations can produce a 404; the saved assignment is retained so it can be translated or changed later.
+
+## Configuration in code
+
+Retrieve the page associated with a custom post type archive through the post type's archive path:
 
 ```php
 /**
@@ -51,40 +74,38 @@ function getCustomPostTypeArchivePage(?string $postType = null): ?\WP_Post
 function getCurrentQueryPostType(): ?string
 {
     global $wp_query;
-    return $wp_query->query['post_type'] ?? null;
+
+    if (!$wp_query instanceof \WP_Query) {
+        return null;
+    }
+
+    $postType = $wp_query->get('post_type');
+    return is_string($postType) && $postType !== '' ? $postType : null;
 }
 
 $archivePage = getCustomPostTypeArchivePage('your_custom_post_type');
 if ($archivePage) {
-    echo "Archive page title: " . $archivePage->post_title;
-    echo "Archive page ID: " . $archivePage->ID;
-    echo "Archive page URL: " . get_permalink($archivePage->ID);
+    echo "Archive page title: " . esc_html($archivePage->post_title);
+    echo "Archive page ID: " . (int) $archivePage->ID;
+    echo "Archive page URL: " . esc_url(get_permalink($archivePage->ID));
 } else {
     echo "No archive page found for this post type.";
 }
 ```
 
-## Requirements
-
-* PHP >= 8.0
-
-## Installation
-
-1. Make sure you have the correct [requirements](#requirements).
-2. Clone the repository and place it in `wp-content/plugins/` folder.
-
 ## Development
 
-Use PHP 8.3 for development and CI. The released plugin still supports PHP 8.0;
-Composer development dependencies are not included in the release.
+Use PHP 8.3 for development and CI. The released plugin still supports PHP 8.0; Composer development dependencies are not included in the release.
 
-1. Perform [Installation](#installation).
-2. Ensure `php --version` reports PHP 8.3 and Composer uses that PHP installation.
-3. Run `composer install` to install development dependencies.
-4. Run `composer check-platform-reqs` and `composer php:lint`.
+```sh
+composer install
+composer check-platform-reqs
+composer validate --strict
+composer php:lint
+```
 
 Keep plugin code compatible with PHP 8.0 when using newer development tools.
 
 ## License
 
-GPLv3
+GPLv3 or later. See [LICENSE](LICENSE).
