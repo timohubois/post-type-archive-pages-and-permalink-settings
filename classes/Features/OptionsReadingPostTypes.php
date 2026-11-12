@@ -122,12 +122,21 @@ final class OptionsReadingPostTypes
         });
 
         ?>
-        <p class="description"><?php esc_html_e('Select the page to display the archive for each post type.', 'post-type-archive-pages-and-permalink-settings'); ?></p>
+        <p class="description">
+            <?php
+            esc_html_e(
+                'Select the page to display the archive for each post type.',
+                'post-type-archive-pages-and-permalink-settings'
+            );
+            ?>
+        </p>
         <br>
         <fieldset>
             <?php foreach ($supportedPostTypes as $postType) {
                 $optionName = self::OPTION_NAME;
-                $selected = is_array($this->options) && isset($this->options[$postType->name]) ? $this->options[$postType->name] : null
+                $selected = is_array($this->options) && isset($this->options[$postType->name])
+                    ? $this->options[$postType->name]
+                    : null
                 ?>
                 <label for="<?php echo esc_attr($optionName) ?>">
                     <?php
@@ -142,7 +151,10 @@ final class OptionsReadingPostTypes
                         [
                             'name' => esc_attr(sprintf('%s[%s]', $optionName, $postType->name)),
                             'echo' => 1,
-                            'show_option_none' => esc_attr__('&mdash; Select &mdash;', 'post-type-archive-pages-and-permalink-settings'),
+                            'show_option_none' => esc_attr__(
+                                '&mdash; Select &mdash;',
+                                'post-type-archive-pages-and-permalink-settings'
+                            ),
                             'option_none_value' => '',
                             'selected' => esc_attr($selected)
                         ]

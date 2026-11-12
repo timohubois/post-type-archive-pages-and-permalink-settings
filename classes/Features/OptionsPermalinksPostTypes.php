@@ -133,13 +133,22 @@ final class OptionsPermalinksPostTypes
         ?>
 
         <p class="description">
-            <strong><?php esc_html_e('Notice: Tags are not tested nor supported!', 'post-type-archive-pages-and-permalink-settings'); ?></strong>
+            <strong>
+                <?php
+                esc_html_e(
+                    'Notice: Tags are not tested nor supported!',
+                    'post-type-archive-pages-and-permalink-settings'
+                );
+                ?>
+            </strong>
         </p>
         <br>
         <fieldset>
             <?php foreach ($supportedPostTypes as $post_type) {
                 $name = sprintf('%s[%s]', $optionName, $post_type->name);
-                $value = is_array($this->options) && isset($this->options[$post_type->name]) ? $this->options[$post_type->name] : '';
+                $value = is_array($this->options) && isset($this->options[$post_type->name])
+                    ? $this->options[$post_type->name]
+                    : '';
                 $placeholder = $post_type->rewrite['slug'] ?? $post_type->name;
                 $hasArchive = $post_type->has_archive ?? false;
                 $withFront = $post_type->rewrite['with_front'] ?? false;
@@ -152,9 +161,17 @@ final class OptionsPermalinksPostTypes
                 );
                 ?>
                 <label for="<?php echo esc_attr($optionName) ?>">
-                    <strong><?php echo esc_html($post_type->label); ?> <?php esc_html_e('base', 'post-type-archive-pages-and-permalink-settings') ?> </strong><br>
+                    <strong>
+                        <?php echo esc_html($post_type->label); ?>
+                        <?php esc_html_e('base', 'post-type-archive-pages-and-permalink-settings') ?>
+                    </strong><br>
                     <code><?php echo esc_url(home_url()) . '/'; ?></code>
-                    <input type="text" name="<?php echo esc_attr($name) ?>" value="<?php echo esc_attr($value) ?>" placeholder="<?php echo esc_attr($placeholder) ?>" />
+                    <input
+                        type="text"
+                        name="<?php echo esc_attr($name) ?>"
+                        value="<?php echo esc_attr($value) ?>"
+                        placeholder="<?php echo esc_attr($placeholder) ?>"
+                    />
                     <code>/%postname%/</code><br>
                     <span class="description">
                         <?php echo esc_html($description) ?>

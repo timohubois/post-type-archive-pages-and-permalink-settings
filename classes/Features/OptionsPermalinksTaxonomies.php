@@ -137,19 +137,36 @@ final class OptionsPermalinksTaxonomies
         wp_nonce_field('optionsPermalinksTaxonomies_update_option', 'optionsPermalinksTaxonomies_nonce');
         ?>
         <p class="description">
-            <strong><?php esc_html_e('Notice: Tags are not tested nor supported!', 'post-type-archive-pages-and-permalink-settings'); ?></strong>
+            <strong>
+                <?php
+                esc_html_e(
+                    'Notice: Tags are not tested nor supported!',
+                    'post-type-archive-pages-and-permalink-settings'
+                );
+                ?>
+            </strong>
         </p>
         <br>
         <fieldset>
             <?php foreach ($supportedTaxonomies as $taxonomy) {
                 $name = sprintf('%s[%s]', $optionName, $taxonomy->name);
-                $value = is_array($this->options) && isset($this->options[$taxonomy->name]) ? $this->options[$taxonomy->name] : '';
+                $value = is_array($this->options) && isset($this->options[$taxonomy->name])
+                    ? $this->options[$taxonomy->name]
+                    : '';
                 $placeholder = $taxonomy->rewrite['slug'] ?? $taxonomy->name;
                 ?>
                 <label for="<?php echo esc_attr($optionName) ?>">
-                    <strong><?php echo esc_html($taxonomy->label); ?> <?php esc_html_e('base', 'post-type-archive-pages-and-permalink-settings') ?> </strong><br>
+                    <strong>
+                        <?php echo esc_html($taxonomy->label); ?>
+                        <?php esc_html_e('base', 'post-type-archive-pages-and-permalink-settings') ?>
+                    </strong><br>
                     <code><?php echo esc_url(home_url()) . '/'; ?></code>
-                    <input type="text" name="<?php echo esc_attr($name) ?>" value="<?php echo esc_attr($value) ?>" placeholder="<?php echo esc_attr($placeholder) ?>" />
+                    <input
+                        type="text"
+                        name="<?php echo esc_attr($name) ?>"
+                        value="<?php echo esc_attr($value) ?>"
+                        placeholder="<?php echo esc_attr($placeholder) ?>"
+                    />
                     <code>/%taxonomyname%/</code>
                 </label><br>
             <?php }

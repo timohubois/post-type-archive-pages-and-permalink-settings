@@ -14,7 +14,7 @@
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  */
 
- /**
+/**
  * Ptatap: Acronym for Post Type Archive and Permalink Settings
  */
 namespace Ptatap;
