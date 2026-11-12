@@ -237,7 +237,8 @@ final class Yoast
         // Remove all existing query params from the archive url, they get may added later.
         $archiveUrl = wp_parse_url($archiveUrl);
         unset($archiveUrl['query']);
-        $archiveUrl = $archiveUrl['scheme'] . '://' . $archiveUrl['host'] . $archiveUrl['path'];
+        $port = isset($archiveUrl['port']) ? ':' . $archiveUrl['port'] : '';
+        $archiveUrl = $archiveUrl['scheme'] . '://' . $archiveUrl['host'] . $port . $archiveUrl['path'];
         $archiveUrl = rtrim($archiveUrl, '/');
 
         global $wp_rewrite;
