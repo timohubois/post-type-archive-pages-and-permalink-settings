@@ -169,7 +169,8 @@ final class OptionsReadingPostTypes
 
     public function maybeFlushRewriteRules(mixed $oldValue, mixed $value, string $option): void
     {
-        if (json_encode($oldValue) === json_encode($value)) {
+        // Stored option maps must match in keys, order and scalar value types.
+        if ($oldValue === $value) {
             return;
         }
 

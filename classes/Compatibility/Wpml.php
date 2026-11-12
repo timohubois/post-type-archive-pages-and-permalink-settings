@@ -600,7 +600,8 @@ final class Wpml
             return $value;
         }
 
-        if (json_encode($old_value) === json_encode($value)) {
+        // Stored option maps must match in keys, order and scalar value types.
+        if ($old_value === $value) {
             return $value;
         }
 
