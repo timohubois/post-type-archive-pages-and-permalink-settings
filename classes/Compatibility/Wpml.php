@@ -612,32 +612,33 @@ final class Wpml
             return $value;
         }
 
-        // Inline function to get the default language page directly from the database, due to the WPML API not being available at this point.
+        // Get the default language page directly from the database:
+        // the WPML API is not available at this point.
         $getDefaultLanguagePage = function ($pageId) use ($wpdb, $defaultLanguage) {
-            $query = $wpdb->prepare(
-                "SELECT trid, element_id
+            $result = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT trid, element_id
                 FROM {$wpdb->prefix}icl_translations
                 WHERE element_id = %d AND element_type = %s",
-                $pageId,
-                'post_page'
+                    $pageId,
+                    'post_page'
+                )
             );
-            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared --its prepared at $query
-            $result = $wpdb->get_row($query);
 
             if (!$result) {
                 return $pageId;
             }
 
-            $query = $wpdb->prepare(
-                "SELECT element_id
+            $defaultPageId = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT element_id
                 FROM {$wpdb->prefix}icl_translations
                 WHERE trid = %d AND language_code = %s AND element_type = %s",
-                $result->trid,
-                $defaultLanguage,
-                'post_page'
+                    $result->trid,
+                    $defaultLanguage,
+                    'post_page'
+                )
             );
-            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared --its prepared at $query
-            $defaultPageId = $wpdb->get_var($query);
 
             return $defaultPageId ? $defaultPageId : $pageId;
         };
