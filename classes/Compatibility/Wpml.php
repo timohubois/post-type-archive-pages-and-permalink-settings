@@ -30,7 +30,12 @@ final class Wpml
             add_filter('wpml_alternate_hreflang', [$this, 'setWpmlAlternateHrefLang'], 10, 2);
 
             add_action('template_redirect', [$this, 'redirectTo404IfArchivePageNotFoundInCurrentLanguage'], 10);
-            add_action('pre_update_option_' . OptionsReadingPostTypes::OPTION_NAME, [$this, 'setOptionValueToDefaultLanguage'], PHP_INT_MAX, 2);
+            add_action(
+                'pre_update_option_' . OptionsReadingPostTypes::OPTION_NAME,
+                [$this, 'setOptionValueToDefaultLanguage'],
+                PHP_INT_MAX,
+                2
+            );
         }
     }
 
@@ -71,8 +76,11 @@ final class Wpml
             return $output;
         }
 
-        /* translators: %s: Title of the archive page. */
-        $optionLabel = sprintf(__('%s — translation missing', 'post-type-archive-pages-and-permalink-settings'), $pageTitle);
+        $optionLabel = sprintf(
+            /* translators: %s: Title of the archive page. */
+            __('%s — translation missing', 'post-type-archive-pages-and-permalink-settings'),
+            $pageTitle
+        );
         $option = sprintf(
             '<option value="%1$d" selected="selected">%2$s</option>',
             $selectedPageId,
@@ -88,11 +96,18 @@ final class Wpml
             return $postTypeReadingSettings;
         }
 
-        $currentLanguage = isset($_GET['lang']) ? sanitize_text_field(wp_unslash($_GET['lang'])) : apply_filters('wpml_current_language', null);
+        $currentLanguage = isset($_GET['lang'])
+            ? sanitize_text_field(wp_unslash($_GET['lang']))
+            : apply_filters('wpml_current_language', null);
 
         foreach ($postTypeReadingSettings as $postType => $value) {
             $returnOriginalIfMissing = true;
-            $postTypeReadingSettings[$postType] = $this->getWpmlObjectId($value, $postType, $returnOriginalIfMissing, $currentLanguage);
+            $postTypeReadingSettings[$postType] = $this->getWpmlObjectId(
+                $value,
+                $postType,
+                $returnOriginalIfMissing,
+                $currentLanguage
+            );
         }
 
         return $postTypeReadingSettings;
@@ -104,7 +119,12 @@ final class Wpml
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
         $languages = apply_filters('wpml_active_languages', [], 'skip_missing=0');
 
-        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false || ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === []) || empty($languages)) {
+        if (
+            $optionsReadingPostTypes === [] ||
+            $optionsReadingPostTypes === false ||
+            ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === []) ||
+            empty($languages)
+        ) {
             return;
         }
 
@@ -193,7 +213,12 @@ final class Wpml
         $languages = apply_filters('wpml_active_languages', [], 'skip_missing=0');
         $defaultLanguageCode = apply_filters('wpml_default_language', null);
 
-        if ($optionsPermalinksTaxonomies === [] || $optionsPermalinksTaxonomies === false || empty($languages) || empty($defaultLanguageCode)) {
+        if (
+            $optionsPermalinksTaxonomies === [] ||
+            $optionsPermalinksTaxonomies === false ||
+            empty($languages) ||
+            empty($defaultLanguageCode)
+        ) {
             return;
         }
 
@@ -201,9 +226,23 @@ final class Wpml
             foreach ($languages as $language) {
                 if ($defaultLanguageCode === $language['code']) {
                     if (!empty($slug)) {
-                        do_action('wpml_register_single_string', 'WordPress', 'URL ' . $taxonomy . ' tax slug', $slug, true, $language['code']);
+                        do_action(
+                            'wpml_register_single_string',
+                            'WordPress',
+                            'URL ' . $taxonomy . ' tax slug',
+                            $slug,
+                            true,
+                            $language['code']
+                        );
                     } else {
-                        do_action('wpml_register_single_string', 'WordPress', 'URL ' . $taxonomy . ' tax slug', $taxonomy, true, $language['code']);
+                        do_action(
+                            'wpml_register_single_string',
+                            'WordPress',
+                            'URL ' . $taxonomy . ' tax slug',
+                            $taxonomy,
+                            true,
+                            $language['code']
+                        );
                     }
                 }
             }
@@ -225,7 +264,11 @@ final class Wpml
             $currentLanguageArchiveUri = $this->getPageForArchiveUri($postId, $currentLanguage);
             foreach ($languages as $language) {
                 $languageArchiveUri = $this->getPageForArchiveUri($postId, $language['code']);
-                if ($currentLanguageArchiveUri === $languageArchiveUri || $currentLanguageArchiveUri === '' || $languageArchiveUri === '') {
+                if (
+                    $currentLanguageArchiveUri === $languageArchiveUri ||
+                    $currentLanguageArchiveUri === '' ||
+                    $languageArchiveUri === ''
+                ) {
                     continue;
                 }
 
@@ -238,7 +281,11 @@ final class Wpml
                         $newKey = str_replace($currentLanguageArchiveUri, $languageArchiveUri, $key);
                         $updatedRules[$newKey] = $rule;
 
-                        $translatedPermalinkBaseUri = $this->getTranslatedPermalinkBaseUri($currentLanguageArchiveUri, $postType, $language['code']);
+                        $translatedPermalinkBaseUri = $this->getTranslatedPermalinkBaseUri(
+                            $currentLanguageArchiveUri,
+                            $postType,
+                            $language['code']
+                        );
                         if ($translatedPermalinkBaseUri !== null) {
                             $newKey = str_replace($currentLanguageArchiveUri, $translatedPermalinkBaseUri, $key);
                             $updatedRules[$newKey] = $rule;
@@ -249,7 +296,11 @@ final class Wpml
                         $newKey = str_replace($languageArchiveUri, $currentLanguageArchiveUri, $key);
                         $updatedRules[$newKey] = $rule;
 
-                        $translatedPermalinkBaseUri = $this->getTranslatedPermalinkBaseUri($currentLanguageArchiveUri, $postType, $language['code']);
+                        $translatedPermalinkBaseUri = $this->getTranslatedPermalinkBaseUri(
+                            $currentLanguageArchiveUri,
+                            $postType,
+                            $language['code']
+                        );
                         if ($translatedPermalinkBaseUri !== null) {
                             $newKey = str_replace($languageArchiveUri, $translatedPermalinkBaseUri, $key);
                             $updatedRules[$newKey] = $rule;
@@ -266,8 +317,20 @@ final class Wpml
     private function getTranslatedPermalinkBaseUri(string $baseUri, string $postType, string $language): string|null
     {
         $defaultLanguage = apply_filters('wpml_default_language', null);
-        $baseUriDefaultLanguage = apply_filters('wpml_translate_single_string', $baseUri, 'WordPress', 'URL slug: ' . $postType, $defaultLanguage);
-        $baseUriCurrentLanguage = apply_filters('wpml_translate_single_string', $baseUri, 'WordPress', 'URL slug: ' . $postType, $language);
+        $baseUriDefaultLanguage = apply_filters(
+            'wpml_translate_single_string',
+            $baseUri,
+            'WordPress',
+            'URL slug: ' . $postType,
+            $defaultLanguage
+        );
+        $baseUriCurrentLanguage = apply_filters(
+            'wpml_translate_single_string',
+            $baseUri,
+            'WordPress',
+            'URL slug: ' . $postType,
+            $language
+        );
 
         if ($baseUriDefaultLanguage === $baseUriCurrentLanguage) {
             return null;
@@ -316,8 +379,20 @@ final class Wpml
         }
 
         // Get translation of the base URI
-        $baseUriDefaultLanguage = apply_filters('wpml_translate_single_string', $baseUri, 'WordPress', 'URL slug: ' . $postType, $defaultLanguage);
-        $baseUriCurrentLanguage = apply_filters('wpml_translate_single_string', $baseUri, 'WordPress', 'URL slug: ' . $postType, $postLanguage);
+        $baseUriDefaultLanguage = apply_filters(
+            'wpml_translate_single_string',
+            $baseUri,
+            'WordPress',
+            'URL slug: ' . $postType,
+            $defaultLanguage
+        );
+        $baseUriCurrentLanguage = apply_filters(
+            'wpml_translate_single_string',
+            $baseUri,
+            'WordPress',
+            'URL slug: ' . $postType,
+            $postLanguage
+        );
         $postLink = str_replace($baseUriDefaultLanguage, $baseUriCurrentLanguage, $postLink);
 
         return trailingslashit($postLink);
@@ -437,7 +512,11 @@ final class Wpml
 
                 $pageForArchiveId = $optionsReadingPostTypes[$postType];
                 $pageForArchiveUri = $this->getPageForArchiveUri($pageForArchiveId, $language['code']);
-                $languages[$key]['url'] = apply_filters('wpml_permalink', home_url($pageForArchiveUri), $language['code']);
+                $languages[$key]['url'] = apply_filters(
+                    'wpml_permalink',
+                    home_url($pageForArchiveUri),
+                    $language['code']
+                );
             }
 
             return $this->addTrailingSlashToIcLsLanguagesUrls($languages);
@@ -576,8 +655,10 @@ final class Wpml
         return $value;
     }
 
-    private function getPageForArchiveUri(string|int|null|bool $pageForArchiveId = null, string|null $languageCode = null): string
-    {
+    private function getPageForArchiveUri(
+        string|int|null|bool $pageForArchiveId = null,
+        string|null $languageCode = null
+    ): string {
 
         $returnOriginalIfMissing = false;
         $wpmlObjectId = $this->getWpmlObjectId($pageForArchiveId, null, $returnOriginalIfMissing, $languageCode);
@@ -593,8 +674,12 @@ final class Wpml
         return implode('/', $wpmlUri);
     }
 
-    private function getWpmlObjectId(string|int|null|bool $postId = 0, string|null $object = null, bool $returnOriginalIfMissing = false, string|null $language = null): string|int|null
-    {
+    private function getWpmlObjectId(
+        string|int|null|bool $postId = 0,
+        string|null $object = null,
+        bool $returnOriginalIfMissing = false,
+        string|null $language = null
+    ): string|int|null {
         if ($object === null || $object === '' || $object === '0') {
             $isPage = (get_post_field('post_type', $postId) === 'page');
             if ($isPage) {

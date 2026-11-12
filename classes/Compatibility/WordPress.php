@@ -67,7 +67,9 @@ final class WordPress
                 return;
             }
 
-            $requestUri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '';
+            $requestUri = isset($_SERVER['REQUEST_URI'])
+                ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI']))
+                : '';
             $requestUri = trim($requestUri, '/');
 
             foreach ($optionsPermalinksPostTypes as $postType => $postTypeSlug) {
@@ -215,7 +217,11 @@ final class WordPress
         }
 
         foreach ($sortedMenuItems as &$sortedMenuItem) {
-            if ($sortedMenuItem->type === 'post_type' && $sortedMenuItem->object === 'page' && (int) $sortedMenuItem->object_id === (int) $postTypeArchivePageId) {
+            if (
+                $sortedMenuItem->type === 'post_type' &&
+                $sortedMenuItem->object === 'page' &&
+                (int) $sortedMenuItem->object_id === (int) $postTypeArchivePageId
+            ) {
                 if (is_singular($queriedPostType) || is_tax($queriedTaxonomy)) {
                     $sortedMenuItem->classes[] = 'current-menu-item-ancestor';
                     $sortedMenuItem->current_item_ancestor = true;
