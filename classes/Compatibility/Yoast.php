@@ -264,6 +264,7 @@ final class Yoast
         $queryVars = $wp->query_vars;
 
         foreach ($queryVars as $key => $value) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only SEO URL construction.
             if (isset($_GET[$key])) {
                 $link = add_query_arg($key, $value, $link);
             }

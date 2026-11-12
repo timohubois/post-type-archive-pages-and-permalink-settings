@@ -101,6 +101,7 @@ final class WordPress
         }
 
         // If we have a post_type query parameter, it's a taxonomy page filtered by post type
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only title selection.
         if (is_tax() && isset($_GET['post_type'])) {
             return self::updateTaxonomyTitle($title);
         }
@@ -131,6 +132,7 @@ final class WordPress
         $taxonomyOptions = OptionsPermalinksTaxonomies::getInstance()->getOptions() ?: [];
 
         foreach (array_keys($taxonomyOptions) as $taxonomy) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only title selection.
             if (isset($_GET[$taxonomy])) {
                 return true;
             }

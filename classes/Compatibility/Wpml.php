@@ -97,9 +97,11 @@ final class Wpml
             return $postTypeReadingSettings;
         }
 
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only language selection.
         $currentLanguage = isset($_GET['lang'])
             ? sanitize_text_field(wp_unslash($_GET['lang']))
             : apply_filters('wpml_current_language', null);
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
 
         foreach ($postTypeReadingSettings as $postType => $value) {
             $returnOriginalIfMissing = true;
