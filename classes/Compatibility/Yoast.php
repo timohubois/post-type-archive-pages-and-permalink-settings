@@ -73,7 +73,7 @@ final class Yoast
                             $(document).ready(function() {
                                 wp.data.dispatch('core/notices').createNotice(
                                     'warning',
-                                    <?php echo json_encode(
+                                    <?php echo wp_json_encode(
                                         '<p><strong>' . esc_html($title) . '</strong></p>' .
                                         wp_kses_post($adminNoticeContent)
                                     ); ?>, {
