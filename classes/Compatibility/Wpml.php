@@ -634,43 +634,44 @@ final class Wpml
             return $value;
         }
 
-        global $wpdb;
-
         $defaultLanguage = apply_filters('wpml_default_language', null);
 
         if (!$defaultLanguage) {
             return $value;
         }
 
-        // Get the default language page directly from the database:
-        // the WPML API is not available at this point.
-        $getDefaultLanguagePage = function ($pageId) use ($wpdb, $defaultLanguage) {
-            $result = $wpdb->get_row(
-                $wpdb->prepare(
-                    "SELECT trid, element_id
-                FROM {$wpdb->prefix}icl_translations
-                WHERE element_id = %d AND element_type = %s",
-                    $pageId,
-                    'post_page'
-                )
+        // Normalize translation records even when page translation is disabled or pages are not public.
+        $getDefaultLanguagePage = function ($pageId) use ($defaultLanguage) {
+            $elementId = (int) $pageId;
+            $languageDetails = apply_filters(
+                'wpml_element_language_details',
+                null,
+                ['element_id' => $elementId, 'element_type' => 'page']
             );
+            $trid = $languageDetails->trid ?? null;
 
-            if (!$result) {
+            if (!$trid) {
                 return $pageId;
             }
 
-            $defaultPageId = $wpdb->get_var(
-                $wpdb->prepare(
-                    "SELECT element_id
-                FROM {$wpdb->prefix}icl_translations
-                WHERE trid = %d AND language_code = %s AND element_type = %s",
-                    $result->trid,
-                    $defaultLanguage,
-                    'post_page'
-                )
+            // Retain empty/non-public records and bypass stale group caches after translation relinking.
+            $translations = apply_filters(
+                'wpml_get_element_translations',
+                [],
+                $trid,
+                'post_page',
+                false,
+                true,
+                true
             );
+            $sourcePages = wp_list_filter($translations, ['element_id' => $elementId, 'element_type' => 'post_page']);
+            $defaultPage = $translations[$defaultLanguage] ?? null;
 
-            return $defaultPageId ? $defaultPageId : $pageId;
+            if (!$sourcePages || ($defaultPage->element_type ?? null) !== 'post_page') {
+                return $pageId;
+            }
+
+            return $defaultPage->element_id ?: $pageId;
         };
 
         if (is_string($value) || is_numeric($value)) {
