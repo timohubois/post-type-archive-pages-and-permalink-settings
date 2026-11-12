@@ -67,6 +67,17 @@ final class OptionsPermalinksPostTypes
             return;
         }
 
+        // Register the sanitizer before processing this screen's custom save request.
+        register_setting(
+            'permalink',
+            self::OPTION_NAME,
+            [
+                'type' => 'array',
+                'sanitize_callback' => [self::class, 'sanitizeOptions'],
+                'default' => [],
+            ]
+        );
+
         if (isset($_POST[self::OPTION_NAME])) {
             if (!isset($_POST['optionsPermalinksPostTypes_nonce'])) {
                 return;
@@ -77,8 +88,10 @@ final class OptionsPermalinksPostTypes
                 return;
             }
 
-            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitizeOptions().
-            $optionValue = self::sanitizeOptions(wp_unslash($_POST[self::OPTION_NAME]));
+            $optionValue = sanitize_option(
+                self::OPTION_NAME,
+                wp_unslash($_POST[self::OPTION_NAME])
+            );
 
             update_option(self::OPTION_NAME, $optionValue);
         }
@@ -89,16 +102,6 @@ final class OptionsPermalinksPostTypes
             [$this, 'renderOptionsSettingsField'],
             'permalink',
             'optional'
-        );
-
-        register_setting(
-            'permalink',
-            self::OPTION_NAME,
-            [
-                'type' => 'array',
-                'sanitize_callback' => [self::class, 'sanitizeOptions'],
-                'default' => [],
-            ]
         );
     }
 
@@ -114,7 +117,8 @@ final class OptionsPermalinksPostTypes
                 continue;
             }
 
-            $sanitized[sanitize_key((string) $postType)] = trim(sanitize_text_field((string) $slug), '/');
+            $slug = sanitize_text_field((string) $slug);
+            $sanitized[sanitize_key((string) $postType)] = trim($slug, ' /');
         }
 
         return $sanitized;
