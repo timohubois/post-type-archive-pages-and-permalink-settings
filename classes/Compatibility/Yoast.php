@@ -310,7 +310,8 @@ final class Yoast
                 sprintf(
                     "<a href='%s' target='_blank' rel='noopener noreferrer'>",
                     admin_url(
-                        'admin.php?page=wpml-string-translation/menu/string-translation.php&strings_per_page=100&context=admin_texts_wpseo_titles'
+                        'admin.php?page=wpml-string-translation/menu/string-translation.php' .
+                        '&strings_per_page=100&context=admin_texts_wpseo_titles'
                     )
                 ),
                 "</a>"
