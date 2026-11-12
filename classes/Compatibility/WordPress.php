@@ -341,7 +341,15 @@ final class WordPress
         }
 
         foreach ($optionsReadingPostTypes as $optionReadingPostType) {
-            if ((int)$optionReadingPostType === $postId) {
+            $archivePageId = (int) $optionReadingPostType;
+            if ($archivePageId <= 0) {
+                continue;
+            }
+
+            if (
+                $archivePageId === $postId ||
+                in_array($postId, get_post_ancestors($archivePageId), true)
+            ) {
                 FlushRewriteRules::getInstance()->setup();
                 return;
             }

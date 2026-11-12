@@ -20,6 +20,7 @@ final class OptionsReadingPostTypes
         $this->options = get_option(self::OPTION_NAME);
 
         add_action('admin_init', [$this, 'addSettings']);
+        add_action('add_option_' . self::OPTION_NAME, [FlushRewriteRules::getInstance(), 'setup'], 10, 0);
         add_action('update_option_' . self::OPTION_NAME, [$this, 'maybeFlushRewriteRules'], 10, 3);
     }
 
