@@ -441,6 +441,14 @@ final class Wpml
             return $translations;
         }
 
+        global $wp_the_query;
+
+        // WPML saved the archive before template_redirect; its switcher must see the resulting 404.
+        if ($wp_the_query instanceof WP_Query && $wp_the_query->is_404()) {
+            $query->set_404();
+            return $translations;
+        }
+
         $options = OptionsReadingPostTypes::getInstance()->getOptions();
         if ($options === [] || $options === false) {
             return $translations;
@@ -491,6 +499,11 @@ final class Wpml
 
     public function setWpmlHeadLangs(array $languages): array
     {
+        // A 404 may offer navigation fallbacks, but they are not equivalent content for hreflang.
+        if (!is_admin() && is_404()) {
+            return [];
+        }
+
         global $wp_query;
 
         if (!$wp_query instanceof WP_Query || !$this->isTranslatedPageArchiveQuery($wp_query)) {
@@ -554,10 +567,6 @@ final class Wpml
     public function setIcLsLanguages(array $languages): array
     {
         global $wp_query;
-
-        if (!is_admin() && is_404()) {
-            return [];
-        }
 
         if (
             is_admin() ||
@@ -648,6 +657,8 @@ final class Wpml
         }
 
         $wp_query->set_404();
+        // Discard request-local switcher URLs built before this request became a 404.
+        (new \WPML_WP_Cache('ls_languages'))->flush_group_cache();
         status_header(404);
         nocache_headers();
     }
