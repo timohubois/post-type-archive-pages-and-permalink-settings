@@ -3,7 +3,7 @@ Contributors: timohubois
 Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.5
 Tested up to: 7.1
-Stable tag: 2.2.8
+Stable tag: 2.3.0
 Requires PHP: 8.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -85,6 +85,17 @@ Report issues or contribute through the [GitHub repository](https://github.com/t
 2. Set bases for custom post type entries and custom taxonomy terms under Settings > Permalinks.
 
 == Changelog ==
+= 2.3.0 =
+* Use WPML's native language-switcher policies for assigned archives, including caller-specific fallbacks.
+* Stop substituting translated archive links for missing single-post translations.
+* Keep missing archive translations as real 404s with native language-homepage navigation and no fallback hreflang equivalents.
+* Preserve native taxonomy and other non-archive language links, and fix assigned static-front archive links.
+* Refresh archive rewrite rules after assigned pages or their ancestors change paths.
+* Normalize WPML archive assignments through native translation APIs while retaining missing translations.
+* Make permalink sanitization stable across repeated saves and correct the displayed with_front setting.
+* Preserve explicit ports in archive SEO URLs and encode Yoast editor notices safely.
+* Improve plugin documentation and PHP quality checks.
+
 = 2.2.8 =
 * Show and preserve assigned archive pages when their WPML translation is missing.
 * Improve settings sanitization, request handling, and translation compatibility.
@@ -179,3 +190,8 @@ Report issues or contribute through the [GitHub repository](https://github.com/t
 
 = 1.0 =
 * Initial Release
+
+== Upgrade Notice ==
+
+= 2.3.0 =
+WPML switchers now use native fallback policies. Missing single-post translations no longer link to archives, and 404s can show language-homepage links. Test site-specific switcher customizations on staging; removing them is not required.
