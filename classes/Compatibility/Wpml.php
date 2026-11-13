@@ -491,6 +491,12 @@ final class Wpml
 
     public function setWpmlHeadLangs(array $languages): array
     {
+        global $wp_query;
+
+        if (!$wp_query instanceof WP_Query || !$this->isTranslatedPageArchiveQuery($wp_query)) {
+            return $languages;
+        }
+
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
         if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
@@ -515,6 +521,11 @@ final class Wpml
 
     public function setWpmlAlternateHrefLang(string $url, string $code): string
     {
+        global $wp_query;
+
+        if (!$wp_query instanceof WP_Query || !$this->isTranslatedPageArchiveQuery($wp_query)) {
+            return $url;
+        }
 
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
@@ -606,19 +617,14 @@ final class Wpml
     public function redirectTo404IfArchivePageNotFoundInCurrentLanguage(): void
     {
 
-        if (is_search()) {
-            return;
-        }
-
         global $wp_query;
         global $wp;
 
-        $queriedPostType = $wp_query->query_vars['post_type'];
-
-        $isPostTypeArchive = is_post_type_archive($queriedPostType);
-        if (!$isPostTypeArchive) {
+        if (!$this->isTranslatedPageArchiveQuery($wp_query)) {
             return;
         }
+
+        $queriedPostType = $wp_query->query_vars['post_type'];
 
         $supportedPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
