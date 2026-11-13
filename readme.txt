@@ -59,6 +59,8 @@ If the current frontend request returns a 404, including a directly requested un
 
 WPML's "Translatable — use translation if available or fallback to default language" setting can make default-language content available at another language's URL. In that mode, a switcher item can remain even with Skip language, because WPML provides a usable content URL. This plugin neither enables that setting nor automatically translates content. A missing assigned archive-page translation still follows the unavailable-archive/404 policy above.
 
+PTAPS adapts assigned archive pages to WPML's native language-switcher policies. Additional site-specific filtering, fallback destinations and visibility rules belong in the site's theme or a site-specific plugin. They may override native behavior; PTAPS does not reproduce or compensate for them. Review existing switcher customizations when updating PTAPS or WPML rather than assuming their behavior will stay unchanged.
+
 = Will the plugin create archive pages or replace my templates? =
 
 No. It associates existing pages with archives and changes their paths and titles. Your theme still needs to render the archive. The Timber integration exposes the assigned page as post in the template context when applicable. Create and publish the pages before assigning them. Assignments are not access controls; a page's password or visibility does not protect a public archive.
