@@ -639,10 +639,11 @@ final class Wpml
 
         $currentLanguage = apply_filters('wpml_current_language', null);
 
-        $requestedUri = $wp->request;
-        $postArchivePermalink = $this->getPageForArchiveUri($pageForArchiveId, $currentLanguage);
-
-        if (str_contains($requestedUri, $postArchivePermalink)) {
+        $translatedPageId = $this->getWpmlObjectId($pageForArchiveId, 'page', false, $currentLanguage);
+        if (
+            (int) $translatedPageId > 0 &&
+            str_contains($wp->request, $this->getPageForArchiveUri($pageForArchiveId, $currentLanguage))
+        ) {
             return;
         }
 
