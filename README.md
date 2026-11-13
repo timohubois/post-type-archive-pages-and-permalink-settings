@@ -8,7 +8,7 @@ PTAPS - Post Type Archive Pages and Permalink Settings associates existing pages
 ## Requirements
 
 - WordPress 6.5 or later.
-- PHP 8.0 or later.
+- PHP 8.3 or later.
 - Public custom post types or taxonomies registered by your theme or another plugin.
 - Working WordPress pretty permalinks for the archive and slug settings.
 
@@ -103,7 +103,7 @@ if ($archivePage) {
 
 ## Development
 
-Use PHP 8.3 for development and CI. The released plugin still supports PHP 8.0; Composer development dependencies are not included in the release.
+Use PHP 8.3 or later for development. CI checks PHP 8.3, the plugin's minimum supported version. Composer development dependencies are not included in the release.
 
 ```sh
 composer install
@@ -112,7 +112,7 @@ composer validate --strict
 composer php:lint
 ```
 
-Keep plugin code compatible with PHP 8.0 when using newer development tools.
+Keep plugin code compatible with PHP 8.3 when using newer development tools.
 
 ## License
 

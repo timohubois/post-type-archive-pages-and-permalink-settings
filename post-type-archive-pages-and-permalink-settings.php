@@ -6,7 +6,7 @@
  * Description:       Assign pages to custom post type archives and manage post type and taxonomy permalinks.
  * Version:           2.3.0
  * Requires at least: 6.5
- * Requires PHP:      8.0
+ * Requires PHP:      8.3
  * Author:            Timo Hubois
  * Author URI:        https://pixelsaft.wtf
  * Text Domain:       post-type-archive-pages-and-permalink-settings

@@ -4,7 +4,7 @@ Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.5
 Tested up to: 7.1
 Stable tag: 2.3.0
-Requires PHP: 8.0
+Requires PHP: 8.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -27,7 +27,7 @@ Test URL changes on staging and review existing links and redirects before chang
 
 == Installation ==
 
-Requires WordPress 6.5 or later and PHP 8.0 or later. Composer, Yoast SEO, WPML and Timber are not required for basic use. Your server must support your chosen WordPress permalink structure.
+Requires WordPress 6.5 or later and PHP 8.3 or later. Composer, Yoast SEO, WPML and Timber are not required for basic use. Your server must support your chosen WordPress permalink structure.
 
 1. Install **PTAPS - Post Type Archive Pages and Permalink Settings** through **Plugins > Add New**, or upload the plugin folder to /wp-content/plugins/post-type-archive-pages-and-permalink-settings/.
 2. Activate the plugin.
@@ -86,6 +86,7 @@ Report issues or contribute through the [GitHub repository](https://github.com/t
 
 == Changelog ==
 = 2.3.0 =
+* Raise the minimum supported PHP version to 8.3.
 * Use WPML's native language-switcher policies for assigned archives, including caller-specific fallbacks.
 * Stop substituting translated archive links for missing single-post translations.
 * Keep missing archive translations as real 404s with native language-homepage navigation and no fallback hreflang equivalents.
@@ -194,4 +195,4 @@ Report issues or contribute through the [GitHub repository](https://github.com/t
 == Upgrade Notice ==
 
 = 2.3.0 =
-WPML switchers now use native fallback policies. Missing single-post translations no longer link to archives, and 404s can show language-homepage links. Test site-specific switcher customizations on staging; removing them is not required.
+Requires PHP 8.3 or later. WPML switchers now use native fallback policies. Missing single-post translations no longer link to archives; 404s can show language-homepage links. Test site-specific switcher customizations on staging; removing them is not required.
