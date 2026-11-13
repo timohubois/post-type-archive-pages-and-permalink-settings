@@ -67,7 +67,9 @@ final class WordPress
                 return;
             }
 
-            $requestUri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '';
+            $requestUri = isset($_SERVER['REQUEST_URI'])
+                ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI']))
+                : '';
             $requestUri = trim($requestUri, '/');
 
             foreach ($optionsPermalinksPostTypes as $postType => $postTypeSlug) {
@@ -99,6 +101,7 @@ final class WordPress
         }
 
         // If we have a post_type query parameter, it's a taxonomy page filtered by post type
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only title selection.
         if (is_tax() && isset($_GET['post_type'])) {
             return self::updateTaxonomyTitle($title);
         }
@@ -129,6 +132,7 @@ final class WordPress
         $taxonomyOptions = OptionsPermalinksTaxonomies::getInstance()->getOptions() ?: [];
 
         foreach (array_keys($taxonomyOptions) as $taxonomy) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only title selection.
             if (isset($_GET[$taxonomy])) {
                 return true;
             }
@@ -215,7 +219,11 @@ final class WordPress
         }
 
         foreach ($sortedMenuItems as &$sortedMenuItem) {
-            if ($sortedMenuItem->type === 'post_type' && $sortedMenuItem->object === 'page' && (int) $sortedMenuItem->object_id === (int) $postTypeArchivePageId) {
+            if (
+                $sortedMenuItem->type === 'post_type' &&
+                $sortedMenuItem->object === 'page' &&
+                (int) $sortedMenuItem->object_id === (int) $postTypeArchivePageId
+            ) {
                 if (is_singular($queriedPostType) || is_tax($queriedTaxonomy)) {
                     $sortedMenuItem->classes[] = 'current-menu-item-ancestor';
                     $sortedMenuItem->current_item_ancestor = true;
@@ -335,7 +343,15 @@ final class WordPress
         }
 
         foreach ($optionsReadingPostTypes as $optionReadingPostType) {
-            if ((int)$optionReadingPostType === $postId) {
+            $archivePageId = (int) $optionReadingPostType;
+            if ($archivePageId <= 0) {
+                continue;
+            }
+
+            if (
+                $archivePageId === $postId ||
+                in_array($postId, get_post_ancestors($archivePageId), true)
+            ) {
                 FlushRewriteRules::getInstance()->setup();
                 return;
             }

@@ -8,7 +8,7 @@ PTAPS - Post Type Archive Pages and Permalink Settings associates existing pages
 ## Requirements
 
 - WordPress 6.5 or later.
-- PHP 8.0 or later.
+- PHP 8.3 or later.
 - Public custom post types or taxonomies registered by your theme or another plugin.
 - Working WordPress pretty permalinks for the archive and slug settings.
 
@@ -29,6 +29,14 @@ The plugin does not create archive pages or register post types and taxonomies. 
 Test URL changes on staging and review existing links and redirects before changing a public site. Changing a page's slug or parent can also change the associated archive path.
 
 With WPML, assign archive pages in the default language and provide their translations. Archive assignments are shared, not selected independently per language. Missing archive-page translations can produce a 404; the saved assignment is retained so it can be translated or changed later.
+
+When viewing an available page or archive, language switchers follow WPML's availability rules: omit unavailable languages with **Skip language**, or link to the target-language homepage with **Link to home**. Caller-specific `skip_missing` and `link_empty_to` arguments remain supported. Unlike earlier plugin versions, missing single-post translations no longer fall back to a translated archive. Homepage and custom switcher fallbacks do not become head hreflang alternates.
+
+If the current frontend request returns a 404, including a directly requested unavailable archive translation, the response remains a WordPress 404. The switcher follows WPML's native 404 behavior, offering language-homepage links rather than presenting an archive as a translation of the missing page. This also applies with Skip language; the per-language Skip/Home/custom policy above concerns available pages and archives. The theme or widget controls switcher visibility.
+
+WPML's **Translatable — use translation if available or fallback to default language** setting can make default-language content available at another language's URL. In that mode, a switcher item can remain even with **Skip language**, because WPML provides a usable content URL. This plugin neither enables that setting nor automatically translates content. A missing assigned archive-page translation still follows the unavailable-archive/404 policy above.
+
+PTAPS adapts assigned archive pages to WPML's native language-switcher policies. Additional site-specific filtering, fallback destinations and visibility rules belong in the site's theme or a site-specific plugin. They may override native behavior; PTAPS does not reproduce or compensate for them. Review existing switcher customizations when updating PTAPS or WPML rather than assuming their behavior will stay unchanged.
 
 ## Configuration in code
 
@@ -95,7 +103,7 @@ if ($archivePage) {
 
 ## Development
 
-Use PHP 8.3 for development and CI. The released plugin still supports PHP 8.0; Composer development dependencies are not included in the release.
+Use PHP 8.3 or later for development. CI checks PHP 8.3, the plugin's minimum supported version. Composer development dependencies are not included in the release.
 
 ```sh
 composer install
@@ -104,7 +112,7 @@ composer validate --strict
 composer php:lint
 ```
 
-Keep plugin code compatible with PHP 8.0 when using newer development tools.
+Keep plugin code compatible with PHP 8.3 when using newer development tools.
 
 ## License
 

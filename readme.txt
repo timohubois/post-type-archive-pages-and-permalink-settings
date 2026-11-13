@@ -3,8 +3,8 @@ Contributors: timohubois
 Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.5
 Tested up to: 7.1
-Stable tag: 2.2.8
-Requires PHP: 8.0
+Stable tag: 2.3.0
+Requires PHP: 8.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -27,7 +27,7 @@ Test URL changes on staging and review existing links and redirects before chang
 
 == Installation ==
 
-Requires WordPress 6.5 or later and PHP 8.0 or later. Composer, Yoast SEO, WPML and Timber are not required for basic use. Your server must support your chosen WordPress permalink structure.
+Requires WordPress 6.5 or later and PHP 8.3 or later. Composer, Yoast SEO, WPML and Timber are not required for basic use. Your server must support your chosen WordPress permalink structure.
 
 1. Install **PTAPS - Post Type Archive Pages and Permalink Settings** through **Plugins > Add New**, or upload the plugin folder to /wp-content/plugins/post-type-archive-pages-and-permalink-settings/.
 2. Activate the plugin.
@@ -53,6 +53,14 @@ The settings include public, non-built-in post types and taxonomies. They do not
 
 Assign archive pages in the default language and provide their translations. Archive assignments are shared, not selected independently per language. Missing archive-page translations can produce a 404; the saved assignment is retained so it can be translated or changed later.
 
+When viewing an available page or archive, language switchers follow WPML's availability rules: omit unavailable languages with Skip language, or link to the target-language homepage with Link to home. Caller-specific skip_missing and link_empty_to arguments remain supported. Unlike earlier plugin versions, missing single-post translations no longer fall back to a translated archive. Homepage and custom switcher fallbacks do not become head hreflang alternates.
+
+If the current frontend request returns a 404, including a directly requested unavailable archive translation, the response remains a WordPress 404. The switcher follows WPML's native 404 behavior, offering language-homepage links rather than presenting an archive as a translation of the missing page. This also applies with Skip language; the per-language Skip/Home/custom policy above concerns available pages and archives. The theme or widget controls switcher visibility.
+
+WPML's "Translatable — use translation if available or fallback to default language" setting can make default-language content available at another language's URL. In that mode, a switcher item can remain even with Skip language, because WPML provides a usable content URL. This plugin neither enables that setting nor automatically translates content. A missing assigned archive-page translation still follows the unavailable-archive/404 policy above.
+
+PTAPS adapts assigned archive pages to WPML's native language-switcher policies. Additional site-specific filtering, fallback destinations and visibility rules belong in the site's theme or a site-specific plugin. They may override native behavior; PTAPS does not reproduce or compensate for them. Review existing switcher customizations when updating PTAPS or WPML rather than assuming their behavior will stay unchanged.
+
 = Will the plugin create archive pages or replace my templates? =
 
 No. It associates existing pages with archives and changes their paths and titles. Your theme still needs to render the archive. The Timber integration exposes the assigned page as post in the template context when applicable. Create and publish the pages before assigning them. Assignments are not access controls; a page's password or visibility does not protect a public archive.
@@ -77,6 +85,18 @@ Report issues or contribute through the [GitHub repository](https://github.com/t
 2. Set bases for custom post type entries and custom taxonomy terms under Settings > Permalinks.
 
 == Changelog ==
+= 2.3.0 =
+* Raise the minimum supported PHP version to 8.3.
+* Use WPML's native language-switcher policies for assigned archives, including caller-specific fallbacks.
+* Stop substituting translated archive links for missing single-post translations.
+* Keep missing archive translations as real 404s with native language-homepage navigation and no fallback hreflang equivalents.
+* Preserve native taxonomy and other non-archive language links, and fix assigned static-front archive links.
+* Refresh archive rewrite rules after assigned pages or their ancestors change paths.
+* Normalize WPML archive assignments through native translation APIs while retaining missing translations.
+* Make permalink sanitization stable across repeated saves and correct the displayed with_front setting.
+* Preserve explicit ports in archive SEO URLs and encode Yoast editor notices safely.
+* Improve plugin documentation and PHP quality checks.
+
 = 2.2.8 =
 * Show and preserve assigned archive pages when their WPML translation is missing.
 * Improve settings sanitization, request handling, and translation compatibility.
@@ -171,3 +191,8 @@ Report issues or contribute through the [GitHub repository](https://github.com/t
 
 = 1.0 =
 * Initial Release
+
+== Upgrade Notice ==
+
+= 2.3.0 =
+Requires PHP 8.3 or later. WPML switchers now use native fallback policies. Missing single-post translations no longer link to archives; 404s can show language-homepage links. Test site-specific switcher customizations on staging; removing them is not required.

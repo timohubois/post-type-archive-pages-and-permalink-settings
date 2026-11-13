@@ -67,6 +67,17 @@ final class OptionsPermalinksTaxonomies
             return;
         }
 
+        // Register the sanitizer before processing this screen's custom save request.
+        register_setting(
+            'permalink',
+            self::OPTION_NAME,
+            [
+                'type' => 'array',
+                'sanitize_callback' => [self::class, 'sanitizeOptions'],
+                'default' => [],
+            ]
+        );
+
         if (isset($_POST[self::OPTION_NAME])) {
             if (!isset($_POST['optionsPermalinksTaxonomies_nonce'])) {
                 return;
@@ -77,8 +88,10 @@ final class OptionsPermalinksTaxonomies
                 return;
             }
 
-            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitizeOptions().
-            $optionValue = self::sanitizeOptions(wp_unslash($_POST[self::OPTION_NAME]));
+            $optionValue = sanitize_option(
+                self::OPTION_NAME,
+                wp_unslash($_POST[self::OPTION_NAME])
+            );
 
             update_option(self::OPTION_NAME, $optionValue);
         }
@@ -89,16 +102,6 @@ final class OptionsPermalinksTaxonomies
             [$this, 'renderOptionsSettingsField'],
             'permalink',
             'optional'
-        );
-
-        register_setting(
-            'permalink',
-            self::OPTION_NAME,
-            [
-                'type' => 'array',
-                'sanitize_callback' => [self::class, 'sanitizeOptions'],
-                'default' => [],
-            ]
         );
     }
 
@@ -114,7 +117,8 @@ final class OptionsPermalinksTaxonomies
                 continue;
             }
 
-            $sanitized[sanitize_key((string) $taxonomy)] = trim(sanitize_text_field((string) $slug), '/');
+            $slug = sanitize_text_field((string) $slug);
+            $sanitized[sanitize_key((string) $taxonomy)] = trim($slug, ' /');
         }
 
         return $sanitized;
@@ -137,19 +141,36 @@ final class OptionsPermalinksTaxonomies
         wp_nonce_field('optionsPermalinksTaxonomies_update_option', 'optionsPermalinksTaxonomies_nonce');
         ?>
         <p class="description">
-            <strong><?php esc_html_e('Notice: Tags are not tested nor supported!', 'post-type-archive-pages-and-permalink-settings'); ?></strong>
+            <strong>
+                <?php
+                esc_html_e(
+                    'Notice: Tags are not tested nor supported!',
+                    'post-type-archive-pages-and-permalink-settings'
+                );
+                ?>
+            </strong>
         </p>
         <br>
         <fieldset>
             <?php foreach ($supportedTaxonomies as $taxonomy) {
                 $name = sprintf('%s[%s]', $optionName, $taxonomy->name);
-                $value = is_array($this->options) && isset($this->options[$taxonomy->name]) ? $this->options[$taxonomy->name] : '';
+                $value = is_array($this->options) && isset($this->options[$taxonomy->name])
+                    ? $this->options[$taxonomy->name]
+                    : '';
                 $placeholder = $taxonomy->rewrite['slug'] ?? $taxonomy->name;
                 ?>
                 <label for="<?php echo esc_attr($optionName) ?>">
-                    <strong><?php echo esc_html($taxonomy->label); ?> <?php esc_html_e('base', 'post-type-archive-pages-and-permalink-settings') ?> </strong><br>
+                    <strong>
+                        <?php echo esc_html($taxonomy->label); ?>
+                        <?php esc_html_e('base', 'post-type-archive-pages-and-permalink-settings') ?>
+                    </strong><br>
                     <code><?php echo esc_url(home_url()) . '/'; ?></code>
-                    <input type="text" name="<?php echo esc_attr($name) ?>" value="<?php echo esc_attr($value) ?>" placeholder="<?php echo esc_attr($placeholder) ?>" />
+                    <input
+                        type="text"
+                        name="<?php echo esc_attr($name) ?>"
+                        value="<?php echo esc_attr($value) ?>"
+                        placeholder="<?php echo esc_attr($placeholder) ?>"
+                    />
                     <code>/%taxonomyname%/</code>
                 </label><br>
             <?php }

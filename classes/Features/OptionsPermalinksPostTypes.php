@@ -67,6 +67,17 @@ final class OptionsPermalinksPostTypes
             return;
         }
 
+        // Register the sanitizer before processing this screen's custom save request.
+        register_setting(
+            'permalink',
+            self::OPTION_NAME,
+            [
+                'type' => 'array',
+                'sanitize_callback' => [self::class, 'sanitizeOptions'],
+                'default' => [],
+            ]
+        );
+
         if (isset($_POST[self::OPTION_NAME])) {
             if (!isset($_POST['optionsPermalinksPostTypes_nonce'])) {
                 return;
@@ -77,8 +88,10 @@ final class OptionsPermalinksPostTypes
                 return;
             }
 
-            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitizeOptions().
-            $optionValue = self::sanitizeOptions(wp_unslash($_POST[self::OPTION_NAME]));
+            $optionValue = sanitize_option(
+                self::OPTION_NAME,
+                wp_unslash($_POST[self::OPTION_NAME])
+            );
 
             update_option(self::OPTION_NAME, $optionValue);
         }
@@ -89,16 +102,6 @@ final class OptionsPermalinksPostTypes
             [$this, 'renderOptionsSettingsField'],
             'permalink',
             'optional'
-        );
-
-        register_setting(
-            'permalink',
-            self::OPTION_NAME,
-            [
-                'type' => 'array',
-                'sanitize_callback' => [self::class, 'sanitizeOptions'],
-                'default' => [],
-            ]
         );
     }
 
@@ -114,7 +117,8 @@ final class OptionsPermalinksPostTypes
                 continue;
             }
 
-            $sanitized[sanitize_key((string) $postType)] = trim(sanitize_text_field((string) $slug), '/');
+            $slug = sanitize_text_field((string) $slug);
+            $sanitized[sanitize_key((string) $postType)] = trim($slug, ' /');
         }
 
         return $sanitized;
@@ -133,28 +137,45 @@ final class OptionsPermalinksPostTypes
         ?>
 
         <p class="description">
-            <strong><?php esc_html_e('Notice: Tags are not tested nor supported!', 'post-type-archive-pages-and-permalink-settings'); ?></strong>
+            <strong>
+                <?php
+                esc_html_e(
+                    'Notice: Tags are not tested nor supported!',
+                    'post-type-archive-pages-and-permalink-settings'
+                );
+                ?>
+            </strong>
         </p>
         <br>
         <fieldset>
             <?php foreach ($supportedPostTypes as $post_type) {
                 $name = sprintf('%s[%s]', $optionName, $post_type->name);
-                $value = is_array($this->options) && isset($this->options[$post_type->name]) ? $this->options[$post_type->name] : '';
+                $value = is_array($this->options) && isset($this->options[$post_type->name])
+                    ? $this->options[$post_type->name]
+                    : '';
                 $placeholder = $post_type->rewrite['slug'] ?? $post_type->name;
                 $hasArchive = $post_type->has_archive ?? false;
                 $withFront = $post_type->rewrite['with_front'] ?? false;
 
                 $description = sprintf(
-                    'post-type: %1$s | has_archive: %2$s | with_front: %2$s',
+                    'post-type: %1$s | has_archive: %2$s | with_front: %3$s',
                     $post_type->name,
                     is_bool($hasArchive) ? ($hasArchive ? 'true' : 'false') : $hasArchive,
                     $withFront ? 'true' : 'false'
                 );
                 ?>
                 <label for="<?php echo esc_attr($optionName) ?>">
-                    <strong><?php echo esc_html($post_type->label); ?> <?php esc_html_e('base', 'post-type-archive-pages-and-permalink-settings') ?> </strong><br>
+                    <strong>
+                        <?php echo esc_html($post_type->label); ?>
+                        <?php esc_html_e('base', 'post-type-archive-pages-and-permalink-settings') ?>
+                    </strong><br>
                     <code><?php echo esc_url(home_url()) . '/'; ?></code>
-                    <input type="text" name="<?php echo esc_attr($name) ?>" value="<?php echo esc_attr($value) ?>" placeholder="<?php echo esc_attr($placeholder) ?>" />
+                    <input
+                        type="text"
+                        name="<?php echo esc_attr($name) ?>"
+                        value="<?php echo esc_attr($value) ?>"
+                        placeholder="<?php echo esc_attr($placeholder) ?>"
+                    />
                     <code>/%postname%/</code><br>
                     <span class="description">
                         <?php echo esc_html($description) ?>

@@ -20,6 +20,7 @@ final class OptionsReadingPostTypes
         $this->options = get_option(self::OPTION_NAME);
 
         add_action('admin_init', [$this, 'addSettings']);
+        add_action('add_option_' . self::OPTION_NAME, [FlushRewriteRules::getInstance(), 'setup'], 10, 0);
         add_action('update_option_' . self::OPTION_NAME, [$this, 'maybeFlushRewriteRules'], 10, 3);
     }
 
@@ -122,12 +123,21 @@ final class OptionsReadingPostTypes
         });
 
         ?>
-        <p class="description"><?php esc_html_e('Select the page to display the archive for each post type.', 'post-type-archive-pages-and-permalink-settings'); ?></p>
+        <p class="description">
+            <?php
+            esc_html_e(
+                'Select the page to display the archive for each post type.',
+                'post-type-archive-pages-and-permalink-settings'
+            );
+            ?>
+        </p>
         <br>
         <fieldset>
             <?php foreach ($supportedPostTypes as $postType) {
                 $optionName = self::OPTION_NAME;
-                $selected = is_array($this->options) && isset($this->options[$postType->name]) ? $this->options[$postType->name] : null
+                $selected = is_array($this->options) && isset($this->options[$postType->name])
+                    ? $this->options[$postType->name]
+                    : null
                 ?>
                 <label for="<?php echo esc_attr($optionName) ?>">
                     <?php
@@ -142,7 +152,10 @@ final class OptionsReadingPostTypes
                         [
                             'name' => esc_attr(sprintf('%s[%s]', $optionName, $postType->name)),
                             'echo' => 1,
-                            'show_option_none' => esc_attr__('&mdash; Select &mdash;', 'post-type-archive-pages-and-permalink-settings'),
+                            'show_option_none' => esc_attr__(
+                                '&mdash; Select &mdash;',
+                                'post-type-archive-pages-and-permalink-settings'
+                            ),
                             'option_none_value' => '',
                             'selected' => esc_attr($selected)
                         ]
@@ -157,7 +170,8 @@ final class OptionsReadingPostTypes
 
     public function maybeFlushRewriteRules(mixed $oldValue, mixed $value, string $option): void
     {
-        if (json_encode($oldValue) === json_encode($value)) {
+        // Stored option maps must match in keys, order and scalar value types.
+        if ($oldValue === $value) {
             return;
         }
 

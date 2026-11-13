@@ -16,3 +16,6 @@ require_once 'classes/Features/OptionsReadingPostTypes.php';
 Ptatap\Features\OptionsPermalinksPostTypes::deleteOptions();
 Ptatap\Features\OptionsPermalinksTaxonomies::deleteOptions();
 Ptatap\Features\OptionsReadingPostTypes::deleteOptions();
+
+delete_transient('ptatap_flush_rewrites');
+delete_transient('ptatap_flush_rewrites_completed');
