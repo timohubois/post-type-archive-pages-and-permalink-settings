@@ -30,6 +30,12 @@ Test URL changes on staging and review existing links and redirects before chang
 
 With WPML, assign archive pages in the default language and provide their translations. Archive assignments are shared, not selected independently per language. Missing archive-page translations can produce a 404; the saved assignment is retained so it can be translated or changed later.
 
+When viewing an available page or archive, language switchers follow WPML's availability rules: omit unavailable languages with **Skip language**, or link to the target-language homepage with **Link to home**. Caller-specific `skip_missing` and `link_empty_to` arguments remain supported. Unlike earlier plugin versions, missing single-post translations no longer fall back to a translated archive. Homepage and custom switcher fallbacks do not become head hreflang alternates.
+
+If the current frontend request returns a 404, including a directly requested unavailable archive translation, the response remains a WordPress 404. The switcher follows WPML's native 404 behavior, offering language-homepage links rather than presenting an archive as a translation of the missing page. This also applies with Skip language; the per-language Skip/Home/custom policy above concerns available pages and archives. The theme or widget controls switcher visibility.
+
+WPML's **Translatable — use translation if available or fallback to default language** setting can make default-language content available at another language's URL. In that mode, a switcher item can remain even with **Skip language**, because WPML provides a usable content URL. This plugin neither enables that setting nor automatically translates content. A missing assigned archive-page translation still follows the unavailable-archive/404 policy above.
+
 ## Configuration in code
 
 Retrieve the page associated with a custom post type archive through the post type's archive path:
