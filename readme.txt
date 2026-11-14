@@ -3,7 +3,7 @@ Contributors: timohubois
 Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.5
 Tested up to: 7.1
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 Requires PHP: 8.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -85,6 +85,9 @@ Report issues or contribute through the [GitHub repository](https://github.com/t
 2. Set bases for custom post type entries and custom taxonomy terms under Settings > Permalinks.
 
 == Changelog ==
+= 2.3.1 =
+* Restore the archive Edit Page toolbar icon on WordPress 7.2 using the native icon API while preserving legacy WordPress rendering.
+
 = 2.3.0 =
 * Raise the minimum supported PHP version to 8.3.
 * Use WPML's native language-switcher policies for assigned archives, including caller-specific fallbacks.

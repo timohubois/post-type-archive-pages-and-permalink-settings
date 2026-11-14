@@ -281,6 +281,7 @@ final class WordPress
             $wpAdminBar->add_menu(
                 [
                     'id' => 'edit',
+                    'icon' => 'core-admin/pencil',
                     'title' => sprintf(
                         '%1$s %2$s',
                         __('Edit', 'post-type-archive-pages-and-permalink-settings'),
