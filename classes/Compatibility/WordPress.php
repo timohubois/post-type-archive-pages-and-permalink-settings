@@ -281,6 +281,8 @@ final class WordPress
             $wpAdminBar->add_menu(
                 [
                     'id' => 'edit',
+                    // WordPress 7.2+ needs an explicit icon; older versions ignore it
+                    // and retain core's CSS pencil.
                     'icon' => 'core-admin/pencil',
                     'title' => sprintf(
                         '%1$s %2$s',
