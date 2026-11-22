@@ -40,7 +40,7 @@ PTAPS adapts assigned archive pages to WPML's native language-switcher policies.
 
 ## Configuration in code
 
-Retrieve the page associated with a custom post type archive through the post type's archive path:
+If a custom post type already has a Page assigned in PTAPS, look up that Page by the registered archive path. This example does not read or verify the saved assignment:
 
 ```php
 /**
@@ -69,7 +69,7 @@ function getCustomPostTypeArchivePage(?string $postType = null): ?\WP_Post
         return null;
     }
 
-    $archivePage = get_page_by_path($archiveSlug);
+    $archivePage = get_page_by_path($archiveSlug, OBJECT, ['page']);
 
     return ($archivePage instanceof \WP_Post) ? $archivePage : null;
 }
