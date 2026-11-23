@@ -387,19 +387,8 @@ final class Wpml
 
     public function getPostTypeArchiveLink(string $link, string $postType): string
     {
-        if (!$this->hasPrettyArchiveLink($postType)) {
-            return $link;
-        }
-
-        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-
-        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
-            return $link;
-        }
-
-        $pageForArchiveId = $optionsReadingPostTypes[$postType] ?? null;
-
-        if ($pageForArchiveId === null) {
+        $pageForArchiveId = OptionsReadingPostTypes::getInstance()->getOptions()[$postType] ?? null;
+        if (!$pageForArchiveId) {
             return $link;
         }
 
@@ -414,7 +403,9 @@ final class Wpml
             return '';
         }
 
-        return $this->getTranslatedArchiveUrl($postType, $pageForArchiveUri, $currentLanguage);
+        return $this->hasPrettyArchiveLink($postType)
+            ? $this->getTranslatedArchiveUrl($postType, $pageForArchiveUri, $currentLanguage)
+            : $link;
     }
 
     /**
@@ -542,12 +533,9 @@ final class Wpml
                 return '';
             }
 
-            if (!$this->hasPrettyArchiveLink($postType)) {
-                // Localize the base first so WPML does not resolve the archive query to its assigned Page.
-                return add_query_arg('post_type', $postType, apply_filters('wpml_permalink', home_url('/'), $code));
-            }
-
-            return $this->getTranslatedArchiveUrl($postType, $pageUri, $code);
+            return $this->hasPrettyArchiveLink($postType)
+                ? $this->getTranslatedArchiveUrl($postType, $pageUri, $code)
+                : $this->getPlainTranslatedArchiveUrl($postType, $code);
         }
 
         return $url;
@@ -575,7 +563,7 @@ final class Wpml
             $hasPrettyLink = $this->hasPrettyArchiveLink($postType);
             $hasDifferentPrefix = $hasPrettyLink
                 && $this->getArchiveRewritePrefix($postType) !== ltrim($wp_rewrite->root, '/');
-            if (!$frontPageId && !$hasDifferentPrefix) {
+            if ($hasPrettyLink && !$frontPageId && !$hasDifferentPrefix) {
                 continue;
             }
 
@@ -591,12 +579,18 @@ final class Wpml
                     ? $this->getWpmlObjectId($frontPageId, 'page', false, $code)
                     : null;
                 $isFrontPage = (int) $translatedPageId === (int) $translatedFrontPageId;
-                if (!$translatedPageId || (!$isFrontPage && !$hasDifferentPrefix)) {
+                if (!$translatedPageId || ($hasPrettyLink && !$isFrontPage && !$hasDifferentPrefix)) {
                     continue;
                 }
 
                 if (!$hasPrettyLink) {
-                    $languages[$key]['url'] = add_query_arg('post_type', $postType, $language['url']);
+                    $languages[$key]['url'] = $this->getPlainArchiveSwitcherUrl(
+                        $language['url'],
+                        $postType,
+                        $code,
+                        (int) $translatedPageId,
+                        $isFrontPage
+                    );
                     continue;
                 }
 
@@ -626,6 +620,31 @@ final class Wpml
         }
 
         return $languages;
+    }
+
+    private function getPlainArchiveSwitcherUrl(
+        string $url,
+        string $postType,
+        string $language,
+        int $pageId,
+        bool $isFrontPage
+    ): string {
+        $archiveUrl = $this->getPlainTranslatedArchiveUrl($postType, $language);
+        $archiveBase = untrailingslashit(substr($archiveUrl, 0, strcspn($archiveUrl, '?#')));
+        $switcherBase = untrailingslashit(substr($url, 0, strcspn($url, '?#')));
+        wp_parse_str(wp_parse_url($url, PHP_URL_QUERY) ?: '', $args);
+
+        // Rewrite WPML's native Page destination only, leaving custom links alone.
+        $targetPageId = $args['page_id'] ?? null;
+        $isAssignedPage = $targetPageId === (string) $pageId || ($isFrontPage && $targetPageId === null);
+        if ($switcherBase !== $archiveBase || !$isAssignedPage) {
+            return $url;
+        }
+
+        unset($args['page_id'], $args['post_type']);
+        $fragment = wp_parse_url($url, PHP_URL_FRAGMENT);
+        $suffix = is_string($fragment) && $fragment !== '' ? '#' . $fragment : '';
+        return add_query_arg(urlencode_deep($args), $archiveUrl) . $suffix;
     }
 
     private function isTranslatedPageArchiveQuery(WP_Query $query): bool
@@ -759,6 +778,15 @@ final class Wpml
         $archivePath = $this->getArchiveRewritePrefix($postType) . $pageUri;
         $archiveUrl = home_url(user_trailingslashit($archivePath, 'post_type_archive'));
         return apply_filters('wpml_permalink', $archiveUrl, $language);
+    }
+
+    private function getPlainTranslatedArchiveUrl(string $postType, string $language): string
+    {
+        // Localize the base first so WPML does not resolve the archive query to its assigned Page.
+        $home = apply_filters('wpml_permalink', home_url('/'), $language);
+        $pathEnd = strcspn($home, '?#');
+        $base = trailingslashit(substr($home, 0, $pathEnd)) . substr($home, $pathEnd);
+        return add_query_arg('post_type', $postType, $base);
     }
 
     private function getPageForArchiveUri(
