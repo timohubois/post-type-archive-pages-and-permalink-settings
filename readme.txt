@@ -85,7 +85,7 @@ Assignments are not access controls: a page's password or visibility does not pr
 
 Save **Settings > Permalinks** once more to rebuild rewrite rules, then clear relevant caches and check the links again.
 
-The plugin schedules rule updates when relevant settings or selected page paths change. After upgrading from 2.3.2 or earlier, save Permalinks once if you use WPML with assigned archives and pretty permalinks and either WPML adds the language as a query parameter (`?lang=en`) or the WordPress Site Address includes a path (for example, `https://example.com/portal/`). This rebuilds translated rewrite rules without changing your settings.
+The plugin schedules rule updates when relevant settings or selected page paths change, so manually saving permalinks is normally only a troubleshooting step.
 
 Check for conflicting page paths, post type or taxonomy bases, other routing plugins and server rules. Make sure pretty permalinks already work on your site.
 
@@ -157,7 +157,7 @@ See [earlier releases](https://github.com/timohubois/post-type-archive-pages-and
 == Upgrade Notice ==
 
 = 2.3.3 =
-If you use WPML with assigned archives and pretty permalinks, save Settings > Permalinks once if WPML uses language query parameters or the WordPress Site Address includes a path such as /portal/.
+Using WPML with archive pages? If your links include a language code like ?lang=en or ?lang=de, or your site address has a path like example.com/portal/, go to Settings > Permalinks after updating and click Save Changes once. Leave the settings as they are. If Plain is selected, skip this step.
 
 = 2.3.0 =
 Requires PHP 8.3 or later. WPML switchers now follow WPML's fallback settings. Missing single-post translations no longer link to archives, and 404 pages may show language-homepage links. Review custom switcher filters for these changes.

@@ -30,10 +30,6 @@ Test URL changes on staging and review existing links and redirects before chang
 
 With WPML, assign archive pages in the default language and provide their translations. Archive assignments are shared, not selected independently per language. Missing archive-page translations can produce a 404; the saved assignment is retained so it can be translated or changed later.
 
-After upgrading from 2.3.2 or earlier, save **Settings > Permalinks** once if you use WPML with assigned archives and pretty permalinks and either WPML adds the language as a query parameter (`?lang=en`) or the WordPress **Site Address (URL)** includes a path (for example, `https://example.com/portal/`). On a site served under a path, this also applies when WPML uses language directories. Saving rebuilds the translated rewrite rules without changing your settings.
-
-If a translated post URL changes, also check its canonical. If Yoast still advertises the old URL and no custom canonical is set, resave the affected post in its own language to refresh Yoast’s generated canonical.
-
 When viewing an available page or archive, language switchers follow WPML's availability rules: omit unavailable languages with **Skip language**, or link to the target-language homepage with **Link to home**. Caller-specific `skip_missing` and `link_empty_to` arguments remain supported. Unlike earlier plugin versions, missing single-post translations no longer fall back to a translated archive. Homepage and custom switcher fallbacks do not become head hreflang alternates.
 
 If the current frontend request returns a 404, including a directly requested unavailable archive translation, the response remains a WordPress 404. The switcher follows WPML's native 404 behavior, offering language-homepage links rather than presenting an archive as a translation of the missing page. This also applies with Skip language; the per-language Skip/Home/custom policy above concerns available pages and archives. The theme or widget controls switcher visibility.
@@ -124,14 +120,8 @@ On a test site with a public custom post type and taxonomy, repeat these checks 
 
 - Check that the single-post and taxonomy suffixes in **Settings > Permalinks** match the selected format.
 - With WPML in directory mode, assign an archive page and translate it and a post. Check that editor permalinks, single-post links and archive links use the right language path and open without a redirect. Repeat with a translated custom post type base and check that using it does not change the archive path.
-- For a hierarchical post type, check that a child's translated permalink and editor sample use the translated base and the full parent/child path. The translated URL should open without a redirect.
-- Repeat with WPML set to add the language as a parameter. In both slash modes, check that the slash belongs to the path, not the language value (for example, `/events/?lang=en`, not `/events/?lang=en/`). Confirm that the translated archive renders the post type archive, not its assigned page.
-- Rebuild rewrite rules with another post type whose archive shares the assigned archive's base as a prefix (for example, `veranstaltungen` and `veranstaltungen-extra`). Translating `veranstaltungen` to `events` must not create an archive at `events-extra` or take over an existing page there.
-- Check that archive `hreflang` links and Yoast's archive canonical and pagination links use the same slash format as the URLs they point to. Page 2 should be canonical to itself and keep the language parameter after the pagination path.
-- With a `/blog/%postname%/` permalink structure, confirm that translated archive and switcher URLs include `/blog/` only when the post type uses `with_front`. With `/index.php/%postname%/`, confirm that archive URLs keep `/index.php/` with either `with_front` setting.
-- With WordPress set to **Plain** permalinks, confirm that the switcher links to the translated archive (`?post_type=…`), not the assigned Page (`?page_id=…`). With the translation missing, confirm that no archive link is generated for that language.
-- On a site served under a path such as `/portal/` with WPML language directories, upgrade from 2.3.2, save **Settings > Permalinks**, and check that the old translated single-post URL redirects to the new URL and that the new URL serves the correct post.
-- Remove the assigned Page's translation on the test site and request the translated archive URL directly. Confirm that it returns an HTTP 404, the default-language archive still works, and **Settings > Reading** retains the assignment and shows it as “translation missing” in the affected language. Check that the missing archive is not advertised in `hreflang`. Restore the Page translation and confirm that the translated archive works again without reselecting the assigned Page.
+- Check that archive `hreflang` links and Yoast's archive canonical and pagination links use the same slash format as the URLs they point to.
+- Remove an archive Page translation and check that the archive returns HTTP 404. Restore the translation and check that it works again without reselecting the Page.
 
 ## License
 
