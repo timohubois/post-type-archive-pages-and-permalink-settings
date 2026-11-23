@@ -121,6 +121,7 @@ On a test site with a public custom post type and taxonomy, repeat these checks 
 - Check that the single-post and taxonomy suffixes in **Settings > Permalinks** match the selected format.
 - With WPML in directory mode, assign an archive page and translate it and a post. Check that editor permalinks, single-post links and archive links use the right language path and open without a redirect. Repeat with a translated custom post type base and check that using it does not change the archive path.
 - Check that archive `hreflang` links and Yoast's archive canonical and pagination links use the same slash format as the URLs they point to.
+- Remove an archive Page translation and check that the archive returns HTTP 404. Restore the translation and check that it works again without reselecting the Page.
 
 ## License
 

@@ -12,6 +12,8 @@ defined('ABSPATH') || exit;
 
 final class Wpml
 {
+    private array $singleRewriteRules = [];
+
     public function __construct()
     {
         if (self::isWpmlActive()) {
@@ -22,8 +24,9 @@ final class Wpml
             add_filter('init', [$this, 'setPostTypeTranslationStrings'], 10);
             add_filter('init', [$this, 'setTaxonomyTranslationStrings'], 15);
 
+            add_action('registered_post_type', [$this, 'trackPostTypeRewriteRules']);
             add_filter('rewrite_rules_array', [$this, 'setRewriteRulesArray'], PHP_INT_MAX, 1);
-            add_filter('post_type_link', [$this, 'getPostTypeLink'], 10, 2);
+            add_filter('post_type_link', [$this, 'getPostTypeLink'], 10, 3);
             add_filter('post_type_archive_link', [$this, 'getPostTypeArchiveLink'], 10, 2);
 
             add_filter('wpml_get_ls_translations', [$this, 'setWpmlLsTranslations'], 10, 2);
@@ -138,22 +141,9 @@ final class Wpml
         $translations = [];
         foreach ($optionsReadingPostTypes as $postType => $postId) {
             foreach ($languages as $language) {
-                $returnOriginalIfMissing = true;
-                $wpmlObjectId = $this->getWpmlObjectId($postId, null, $returnOriginalIfMissing, $language['code']);
-                $pageUri = get_page_uri($wpmlObjectId);
-                $wpmlPermalink = apply_filters('wpml_permalink', home_url($pageUri), $language['code']);
-                $wpmlUri = trim(wp_make_link_relative($wpmlPermalink), '/');
-
-                $wpmlUri = explode('/', $wpmlUri);
-                if ($wpmlUri[0] === $language['code']) {
-                    array_shift($wpmlUri);
-                }
-
-                $wpmlUri = implode('/', $wpmlUri);
-
                 $translations[$postType][$language['code']] = [
                     'permalink' => $optionsPermalinksPostTypes[$postType]
-                        ?? $wpmlUri
+                        ?? $this->getPageForArchiveUri($postId, $language['code'], true)
                 ];
             }
         }
@@ -254,97 +244,91 @@ final class Wpml
         }
     }
 
-    public function setRewriteRulesArray(array $rules): array
+    public function trackPostTypeRewriteRules(string $postType): void
     {
-        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-
-        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
-            return $rules;
+        if (empty(OptionsReadingPostTypes::getInstance()->getOptions()[$postType])) {
+            return;
         }
 
-        $languages = apply_filters('wpml_active_languages', [], 'skip_missing=0');
-        $currentLanguage = apply_filters('wpml_current_language', null);
+        add_filter($postType . '_rewrite_rules', function (array $rules) use ($postType): array {
+            // Core groups the single-post rules here, including feeds and attachment rules.
+            $this->singleRewriteRules[$postType] = $rules;
+            return $rules;
+        }, PHP_INT_MAX);
+    }
 
-        foreach ($optionsReadingPostTypes as $postType => $postId) {
-            $currentLanguageArchiveUri = $this->getPageForArchiveUri($postId, $currentLanguage);
+    public function setRewriteRulesArray(array $rules): array
+    {
+        $assignments = OptionsReadingPostTypes::getInstance()->getOptions() ?: [];
+        $customBases = OptionsPermalinksPostTypes::getInstance()->getOptions() ?: [];
+        $languages = apply_filters('wpml_active_languages', [], 'skip_missing=0');
+
+        foreach ($assignments as $postType => $postId) {
+            $type = get_post_type_object($postType);
+            if (!$type || !is_array($type->rewrite) || !$type->has_archive || empty($postId)) {
+                continue;
+            }
+
+            $prefix = $this->getArchiveRewritePrefix($postType);
+            $archiveBase = $type->has_archive === true ? $type->rewrite['slug'] : $type->has_archive;
+            $archiveQuery = 'index.php?post_type=' . $postType;
+            $singleRules = $this->singleRewriteRules[$postType] ?? [];
+            $archiveBases = [];
+            $singleBases = [];
             foreach ($languages as $language) {
-                $languageArchiveUri = $this->getPageForArchiveUri($postId, $language['code']);
-                if (
-                    $currentLanguageArchiveUri === $languageArchiveUri ||
-                    $currentLanguageArchiveUri === '' ||
-                    $languageArchiveUri === ''
+                $code = $language['code'];
+                $archiveUri = $this->getPageForArchiveUri($postId, $code);
+                $archiveBases[] = $archiveUri;
+                $singleBases[] = !empty($customBases[$postType])
+                    ? $this->translatePermalinkBase($customBases[$postType], $postType, $code)
+                    : $archiveUri;
+            }
+
+            $updatedRules = [];
+            foreach ($rules as $key => $rule) {
+                $updatedRules[$key] = $rule;
+                if (($singleRules[$key] ?? null) === $rule) {
+                    $source = $prefix . $type->rewrite['slug'];
+                    $targets = $singleBases;
+                } elseif (
+                    $rule === $archiveQuery ||
+                    str_starts_with($rule, $archiveQuery . '&paged=') ||
+                    str_starts_with($rule, $archiveQuery . '&feed=')
                 ) {
+                    $source = $prefix . $archiveBase;
+                    $targets = $archiveBases;
+                } else {
                     continue;
                 }
 
-                $updatedRules = [];
-                foreach ($rules as $key => $rule) {
-                    // Always add the original rule
-                    $updatedRules[$key] = $rule;
-
-                    if (str_contains($key, $currentLanguageArchiveUri)) {
-                        $newKey = str_replace($currentLanguageArchiveUri, $languageArchiveUri, $key);
-                        $updatedRules[$newKey] = $rule;
-
-                        $translatedPermalinkBaseUri = $this->getTranslatedPermalinkBaseUri(
-                            $currentLanguageArchiveUri,
-                            $postType,
-                            $language['code']
-                        );
-                        if ($translatedPermalinkBaseUri !== null) {
-                            $newKey = str_replace($currentLanguageArchiveUri, $translatedPermalinkBaseUri, $key);
-                            $updatedRules[$newKey] = $rule;
-                        }
-                    }
-
-                    if (str_contains($key, $languageArchiveUri)) {
-                        $newKey = str_replace($languageArchiveUri, $currentLanguageArchiveUri, $key);
-                        $updatedRules[$newKey] = $rule;
-
-                        $translatedPermalinkBaseUri = $this->getTranslatedPermalinkBaseUri(
-                            $currentLanguageArchiveUri,
-                            $postType,
-                            $language['code']
-                        );
-                        if ($translatedPermalinkBaseUri !== null) {
-                            $newKey = str_replace($languageArchiveUri, $translatedPermalinkBaseUri, $key);
-                            $updatedRules[$newKey] = $rule;
-                        }
-                    }
+                $sourceLength = strlen($source);
+                if (!str_starts_with($key, $source) || ($key[$sourceLength] ?? '') !== '/') {
+                    continue;
                 }
 
-                $rules = $updatedRules;
+                foreach ($targets as $target) {
+                    if ($target === '') {
+                        continue;
+                    }
+                    $translatedKey = $prefix . $target . substr($key, $sourceLength);
+                    if (!isset($rules[$translatedKey]) && !isset($updatedRules[$translatedKey])) {
+                        $updatedRules[$translatedKey] = $rule;
+                    }
+                }
             }
+            $rules = $updatedRules;
         }
+
+        $this->singleRewriteRules = [];
         return $rules;
     }
 
-    private function getTranslatedPermalinkBaseUri(string $baseUri, string $postType, string $language): string|null
+    private function translatePermalinkBase(string $base, string $postType, string $language): string
     {
-        $defaultLanguage = apply_filters('wpml_default_language', null);
-        $baseUriDefaultLanguage = apply_filters(
-            'wpml_translate_single_string',
-            $baseUri,
-            'WordPress',
-            'URL slug: ' . $postType,
-            $defaultLanguage
-        );
-        $baseUriCurrentLanguage = apply_filters(
-            'wpml_translate_single_string',
-            $baseUri,
-            'WordPress',
-            'URL slug: ' . $postType,
-            $language
-        );
-
-        if ($baseUriDefaultLanguage === $baseUriCurrentLanguage) {
-            return null;
-        }
-
-        return $baseUriCurrentLanguage;
+        return apply_filters('wpml_translate_single_string', $base, 'WordPress', 'URL slug: ' . $postType, $language);
     }
 
-    public function getPostTypeLink(string $postLink, WP_Post $wpPost): string
+    public function getPostTypeLink(string $postLink, WP_Post $wpPost, bool $leaveName = false): string
     {
         $optionsPermalinksPostTypes = OptionsPermalinksPostTypes::getInstance()->getOptions();
         $postType = get_post_field('post_type', $wpPost);
@@ -362,56 +346,49 @@ final class Wpml
         }
 
         $postLanguageDetails = apply_filters('wpml_post_language_details', null, $wpPost->ID);
-        $postLanguage = $postLanguageDetails['language_code'];
+        $postLanguage = $postLanguageDetails['language_code'] ?? null;
         $defaultLanguage = apply_filters('wpml_default_language', null);
 
-        if ($optionsPermalinksPostTypes === false || $optionsPermalinksPostTypes === []) {
-            $pageForArchiveUriDefaultLanguage = $this->getPageForArchiveUri($pageForArchiveId, $defaultLanguage);
-            $pageForArchiveUriCurrentLanguage = $this->getPageForArchiveUri($pageForArchiveId, $postLanguage);
-
-            if ($pageForArchiveUriDefaultLanguage !== $pageForArchiveUriCurrentLanguage) {
-                return str_replace($pageForArchiveUriDefaultLanguage, $pageForArchiveUriCurrentLanguage, $postLink);
-            }
-        }
-
-        if ($postLanguage === $defaultLanguage) {
+        if (!$postLanguage || !$defaultLanguage || $postLanguage === $defaultLanguage) {
             return $postLink;
         }
 
-        $baseUri = $optionsPermalinksPostTypes[$postType] ?? null;
-        if (!$baseUri) {
+        $base = $optionsPermalinksPostTypes[$postType] ?? '';
+        $originalBase = $base
+            ? $this->translatePermalinkBase($base, $postType, $defaultLanguage)
+            : $this->getPageForArchiveUri($pageForArchiveId, $defaultLanguage);
+        $translatedBase = $base
+            ? $this->translatePermalinkBase($base, $postType, $postLanguage)
+            : $this->getPageForArchiveUri($pageForArchiveId, $postLanguage);
+        if ($originalBase === '' || $translatedBase === '' || $originalBase === $translatedBase) {
             return $postLink;
         }
 
-        // Get translation of the base URI
-        $baseUriDefaultLanguage = apply_filters(
-            'wpml_translate_single_string',
-            $baseUri,
-            'WordPress',
-            'URL slug: ' . $postType,
-            $defaultLanguage
-        );
-        $baseUriCurrentLanguage = apply_filters(
-            'wpml_translate_single_string',
-            $baseUri,
-            'WordPress',
-            'URL slug: ' . $postType,
-            $postLanguage
-        );
-        return str_replace($baseUriDefaultLanguage, $baseUriCurrentLanguage, $postLink);
+        $postPath = is_post_type_hierarchical($postType) ? get_page_uri($wpPost) : $wpPost->post_name;
+        if ($leaveName) {
+            $postPath = '%' . $postType . '%';
+        }
+
+        // Match the full post path, including ancestors, without touching the URL suffix or WordPress's slash.
+        $path = wp_parse_url($postLink, PHP_URL_PATH);
+        if (!$postPath || !is_string($path)) {
+            return $postLink;
+        }
+
+        $pathWithoutSlash = untrailingslashit($path);
+        $baseAndPost = '/' . $originalBase . '/' . $postPath;
+        if (!str_ends_with($pathWithoutSlash, $baseAndPost)) {
+            return $postLink;
+        }
+
+        $offset = strcspn($postLink, '?#') - strlen($path) + strlen($pathWithoutSlash) - strlen($baseAndPost);
+        return substr_replace($postLink, '/' . $translatedBase, $offset, strlen('/' . $originalBase));
     }
 
     public function getPostTypeArchiveLink(string $link, string $postType): string
     {
-        $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
-
-        if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
-            return $link;
-        }
-
-        $pageForArchiveId = $optionsReadingPostTypes[$postType] ?? null;
-
-        if ($pageForArchiveId === null) {
+        $pageForArchiveId = OptionsReadingPostTypes::getInstance()->getOptions()[$postType] ?? null;
+        if (!$pageForArchiveId) {
             return $link;
         }
 
@@ -426,8 +403,9 @@ final class Wpml
             return '';
         }
 
-        $archiveUrl = home_url(user_trailingslashit($pageForArchiveUri, 'post_type_archive'));
-        return apply_filters('wpml_permalink', $archiveUrl, $currentLanguage);
+        return $this->hasPrettyArchiveLink($postType)
+            ? $this->getTranslatedArchiveUrl($postType, $pageForArchiveUri, $currentLanguage)
+            : $link;
     }
 
     /**
@@ -550,15 +528,14 @@ final class Wpml
                 continue;
             }
 
-            $returnOriginalIfMissing = false;
-            $wpmlObjectId = $this->getWpmlObjectId($postId, 'page', $returnOriginalIfMissing, $code);
-            if (!$wpmlObjectId) {
+            $pageUri = $this->getPageForArchiveUri($postId, $code);
+            if ($pageUri === '') {
                 return '';
             }
 
-            $pageUri = get_page_uri($wpmlObjectId);
-            $archiveUrl = home_url(user_trailingslashit($pageUri, 'post_type_archive'));
-            return apply_filters('wpml_permalink', $archiveUrl, $code);
+            return $this->hasPrettyArchiveLink($postType)
+                ? $this->getTranslatedArchiveUrl($postType, $pageUri, $code)
+                : $this->getPlainTranslatedArchiveUrl($postType, $code);
         }
 
         return $url;
@@ -566,25 +543,27 @@ final class Wpml
 
     public function setIcLsLanguages(array $languages): array
     {
-        global $wp_query;
+        global $wp_query, $wp_rewrite;
 
-        if (
-            is_admin() ||
-            !$wp_query instanceof WP_Query ||
-            !$this->isTranslatedPageArchiveQuery($wp_query) ||
-            get_option('show_on_front') !== 'page'
-        ) {
+        if (is_admin() || !$wp_query instanceof WP_Query || !$this->isTranslatedPageArchiveQuery($wp_query)) {
             return $languages;
         }
 
-        $frontPageId = get_option('page_on_front');
+        $frontPageId = get_option('show_on_front') === 'page' ? get_option('page_on_front') : 0;
         $options = OptionsReadingPostTypes::getInstance()->getOptions();
-        if (!$frontPageId || $options === [] || $options === false) {
+        if ($options === [] || $options === false) {
             return $languages;
         }
 
         foreach ($options as $postType => $pageId) {
             if (!$wp_query->is_post_type_archive($postType) || empty($pageId)) {
+                continue;
+            }
+
+            $hasPrettyLink = $this->hasPrettyArchiveLink($postType);
+            $hasDifferentPrefix = $hasPrettyLink
+                && $this->getArchiveRewritePrefix($postType) !== ltrim($wp_rewrite->root, '/');
+            if ($hasPrettyLink && !$frontPageId && !$hasDifferentPrefix) {
                 continue;
             }
 
@@ -594,15 +573,43 @@ final class Wpml
                     continue;
                 }
 
-                $translatedPageId = $this->getWpmlObjectId($pageId, 'page', false, $language['code']);
-                $translatedFrontPageId = $this->getWpmlObjectId($frontPageId, 'page', false, $language['code']);
-                if (!$translatedPageId || (int) $translatedPageId !== (int) $translatedFrontPageId) {
+                $code = $language['code'];
+                $translatedPageId = $this->getWpmlObjectId($pageId, 'page', false, $code);
+                $translatedFrontPageId = $frontPageId
+                    ? $this->getWpmlObjectId($frontPageId, 'page', false, $code)
+                    : null;
+                $isFrontPage = (int) $translatedPageId === (int) $translatedFrontPageId;
+                if (!$translatedPageId || ($hasPrettyLink && !$isFrontPage && !$hasDifferentPrefix)) {
                     continue;
                 }
 
-                // A front page's permalink is home, but its assigned archive still uses the page URI.
-                $archiveUrl = home_url(user_trailingslashit(get_page_uri($translatedPageId), 'post_type_archive'));
-                $archiveUrl = apply_filters('wpml_permalink', $archiveUrl, $language['code']);
+                if (!$hasPrettyLink) {
+                    $languages[$key]['url'] = $this->getPlainArchiveSwitcherUrl(
+                        $language['url'],
+                        $postType,
+                        $code,
+                        (int) $translatedPageId,
+                        $isFrontPage
+                    );
+                    continue;
+                }
+
+                $pageUri = get_page_uri($translatedPageId);
+                if (!$pageUri) {
+                    continue;
+                }
+
+                if (!$isFrontPage) {
+                    // Match the translated Page path without resolving its permalink in the current language.
+                    $pageUrl = home_url(user_trailingslashit($wp_rewrite->root . $pageUri, 'page'));
+                    $pageUrl = apply_filters('wpml_permalink', $pageUrl, $code);
+                    if (explode('?', $language['url'], 2)[0] !== explode('?', $pageUrl, 2)[0]) {
+                        continue;
+                    }
+                }
+
+                // The assigned Page may be the homepage or lack the post type's rewrite front.
+                $archiveUrl = $this->getTranslatedArchiveUrl($postType, $pageUri, $code);
                 $queryString = wp_parse_url($language['url'], PHP_URL_QUERY);
                 if (is_string($queryString) && $queryString !== '') {
                     // Retain WPML's language parameter and already encoded copied arguments verbatim.
@@ -613,6 +620,31 @@ final class Wpml
         }
 
         return $languages;
+    }
+
+    private function getPlainArchiveSwitcherUrl(
+        string $url,
+        string $postType,
+        string $language,
+        int $pageId,
+        bool $isFrontPage
+    ): string {
+        $archiveUrl = $this->getPlainTranslatedArchiveUrl($postType, $language);
+        $archiveBase = untrailingslashit(substr($archiveUrl, 0, strcspn($archiveUrl, '?#')));
+        $switcherBase = untrailingslashit(substr($url, 0, strcspn($url, '?#')));
+        wp_parse_str(wp_parse_url($url, PHP_URL_QUERY) ?: '', $args);
+
+        // Rewrite WPML's native Page destination only, leaving custom links alone.
+        $targetPageId = $args['page_id'] ?? null;
+        $isAssignedPage = $targetPageId === (string) $pageId || ($isFrontPage && $targetPageId === null);
+        if ($switcherBase !== $archiveBase || !$isAssignedPage) {
+            return $url;
+        }
+
+        unset($args['page_id'], $args['post_type']);
+        $fragment = wp_parse_url($url, PHP_URL_FRAGMENT);
+        $suffix = is_string($fragment) && $fragment !== '' ? '#' . $fragment : '';
+        return add_query_arg(urlencode_deep($args), $archiveUrl) . $suffix;
     }
 
     private function isTranslatedPageArchiveQuery(WP_Query $query): bool
@@ -648,10 +680,10 @@ final class Wpml
 
         $currentLanguage = apply_filters('wpml_current_language', null);
 
-        $translatedPageId = $this->getWpmlObjectId($pageForArchiveId, 'page', false, $currentLanguage);
+        $archiveUri = $this->getPageForArchiveUri($pageForArchiveId, $currentLanguage);
         if (
-            (int) $translatedPageId > 0 &&
-            str_contains($wp->request, $this->getPageForArchiveUri($pageForArchiveId, $currentLanguage))
+            $archiveUri !== '' &&
+            (!$this->hasPrettyArchiveLink($queriedPostType) || str_contains($wp->request, $archiveUri))
         ) {
             return;
         }
@@ -727,23 +759,45 @@ final class Wpml
         return $value;
     }
 
+    private function hasPrettyArchiveLink(string $postType): bool
+    {
+        return get_option('permalink_structure') && is_array(get_post_type_object($postType)->rewrite ?? null);
+    }
+
+    private function getArchiveRewritePrefix(string $postType): string
+    {
+        global $wp_rewrite;
+
+        // Match WordPress archive routing: the root can contain index.php even without the front.
+        $useFront = get_post_type_object($postType)->rewrite['with_front'] ?? false;
+        return ltrim($useFront ? $wp_rewrite->front : $wp_rewrite->root, '/');
+    }
+
+    private function getTranslatedArchiveUrl(string $postType, string $pageUri, string $language): string
+    {
+        $archivePath = $this->getArchiveRewritePrefix($postType) . $pageUri;
+        $archiveUrl = home_url(user_trailingslashit($archivePath, 'post_type_archive'));
+        return apply_filters('wpml_permalink', $archiveUrl, $language);
+    }
+
+    private function getPlainTranslatedArchiveUrl(string $postType, string $language): string
+    {
+        // Localize the base first so WPML does not resolve the archive query to its assigned Page.
+        $home = apply_filters('wpml_permalink', home_url('/'), $language);
+        $pathEnd = strcspn($home, '?#');
+        $base = trailingslashit(substr($home, 0, $pathEnd)) . substr($home, $pathEnd);
+        return add_query_arg('post_type', $postType, $base);
+    }
+
     private function getPageForArchiveUri(
-        string|int|null|bool $pageForArchiveId = null,
-        string|null $languageCode = null
+        string|int|null|bool $pageForArchiveId,
+        ?string $languageCode,
+        bool $returnOriginalIfMissing = false
     ): string {
+        $translatedPageId = $this->getWpmlObjectId($pageForArchiveId, 'page', $returnOriginalIfMissing, $languageCode);
 
-        $returnOriginalIfMissing = false;
-        $wpmlObjectId = $this->getWpmlObjectId($pageForArchiveId, null, $returnOriginalIfMissing, $languageCode);
-        $pageUri = get_page_uri($wpmlObjectId);
-        $wpmlPermalink = apply_filters('wpml_permalink', home_url($pageUri), $languageCode);
-        $wpmlUri = trim(wp_make_link_relative($wpmlPermalink), '/');
-
-        $wpmlUri = explode('/', $wpmlUri);
-        if ($wpmlUri[0] === $languageCode) {
-            array_shift($wpmlUri);
-        }
-
-        return implode('/', $wpmlUri);
+        // A rewrite slug is relative to the site, with no language directory, host, or query string.
+        return $translatedPageId ? (string) get_page_uri($translatedPageId) : '';
     }
 
     private function getWpmlObjectId(
