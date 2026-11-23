@@ -3,7 +3,7 @@ Contributors: timohubois
 Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.5
 Tested up to: 7.1
-Stable tag: 2.3.2
+Stable tag: 2.3.3
 Requires PHP: 8.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -124,6 +124,12 @@ Report issues or contribute on [GitHub](https://github.com/timohubois/post-type-
 
 == Changelog ==
 
+= 2.3.3 =
+* Fix WPML archive and single-post links in query-parameter mode and on sites served under a subdirectory.
+* Scope translated rewrite rules to the assigned post type and preserve existing rules.
+* Respect WordPress archive prefixes and fix language switcher links with Plain permalinks.
+* Preserve language parameters in Yoast archive canonicals and pagination links.
+
 = 2.3.2 =
 * Respect the WordPress trailing-slash setting in WPML permalinks and Yoast archive links.
 * Show the configured trailing-slash format in post type and taxonomy permalink settings.
@@ -149,6 +155,9 @@ Report issues or contribute on [GitHub](https://github.com/timohubois/post-type-
 See [earlier releases](https://github.com/timohubois/post-type-archive-pages-and-permalink-settings/releases) for older changes.
 
 == Upgrade Notice ==
+
+= 2.3.3 =
+If you use WPML with assigned archives and pretty permalinks, save Settings > Permalinks once if WPML uses language query parameters or the WordPress Site Address includes a path such as /portal/.
 
 = 2.3.0 =
 Requires PHP 8.3 or later. WPML switchers now follow WPML's fallback settings. Missing single-post translations no longer link to archives, and 404 pages may show language-homepage links. Review custom switcher filters for these changes.
