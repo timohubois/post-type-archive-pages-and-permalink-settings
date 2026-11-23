@@ -85,7 +85,7 @@ Assignments are not access controls: a page's password or visibility does not pr
 
 Save **Settings > Permalinks** once more to rebuild rewrite rules, then clear relevant caches and check the links again.
 
-The plugin schedules rule updates when relevant settings or selected page paths change, so manually saving permalinks is normally only a troubleshooting step.
+The plugin schedules rule updates when relevant settings or selected page paths change. After upgrading from 2.3.2 or earlier, save Permalinks once if you use WPML with assigned archives and pretty permalinks and either WPML adds the language as a query parameter (`?lang=en`) or the WordPress Site Address includes a path (for example, `https://example.com/portal/`). This rebuilds translated rewrite rules without changing your settings.
 
 Check for conflicting page paths, post type or taxonomy bases, other routing plugins and server rules. Make sure pretty permalinks already work on your site.
 
