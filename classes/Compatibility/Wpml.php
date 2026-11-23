@@ -352,13 +352,13 @@ final class Wpml
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
         if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
-            return trailingslashit($postLink);
+            return $postLink;
         }
 
         $pageForArchiveId = $optionsReadingPostTypes[$postType] ?? null;
 
         if (!$pageForArchiveId) {
-            return trailingslashit($postLink);
+            return $postLink;
         }
 
         $postLanguageDetails = apply_filters('wpml_post_language_details', null, $wpPost->ID);
@@ -375,12 +375,12 @@ final class Wpml
         }
 
         if ($postLanguage === $defaultLanguage) {
-            return trailingslashit($postLink);
+            return $postLink;
         }
 
         $baseUri = $optionsPermalinksPostTypes[$postType] ?? null;
         if (!$baseUri) {
-            return trailingslashit($postLink);
+            return $postLink;
         }
 
         // Get translation of the base URI
@@ -398,9 +398,7 @@ final class Wpml
             'URL slug: ' . $postType,
             $postLanguage
         );
-        $postLink = str_replace($baseUriDefaultLanguage, $baseUriCurrentLanguage, $postLink);
-
-        return trailingslashit($postLink);
+        return str_replace($baseUriDefaultLanguage, $baseUriCurrentLanguage, $postLink);
     }
 
     public function getPostTypeArchiveLink(string $link, string $postType): string
@@ -408,19 +406,19 @@ final class Wpml
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
         if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
-            return trailingslashit($link);
+            return $link;
         }
 
         $pageForArchiveId = $optionsReadingPostTypes[$postType] ?? null;
 
         if ($pageForArchiveId === null) {
-            return trailingslashit($link);
+            return $link;
         }
 
         $currentLanguage = apply_filters('wpml_current_language', null);
 
         if (empty($currentLanguage)) {
-            return trailingslashit($link);
+            return $link;
         }
 
         $pageForArchiveUri = $this->getPageForArchiveUri($pageForArchiveId, $currentLanguage);
@@ -428,7 +426,8 @@ final class Wpml
             return '';
         }
 
-        return apply_filters('wpml_permalink', home_url($pageForArchiveUri), $currentLanguage);
+        $archiveUrl = home_url(user_trailingslashit($pageForArchiveUri, 'post_type_archive'));
+        return apply_filters('wpml_permalink', $archiveUrl, $currentLanguage);
     }
 
     /**
@@ -543,7 +542,7 @@ final class Wpml
         $optionsReadingPostTypes = OptionsReadingPostTypes::getInstance()->getOptions();
 
         if ($optionsReadingPostTypes === [] || $optionsReadingPostTypes === false) {
-            return trailingslashit($url);
+            return $url;
         }
 
         foreach ($optionsReadingPostTypes as $postType => $postId) {
@@ -558,10 +557,11 @@ final class Wpml
             }
 
             $pageUri = get_page_uri($wpmlObjectId);
-            return trailingslashit(apply_filters('wpml_permalink', home_url($pageUri), $code));
+            $archiveUrl = home_url(user_trailingslashit($pageUri, 'post_type_archive'));
+            return apply_filters('wpml_permalink', $archiveUrl, $code);
         }
 
-        return trailingslashit($url);
+        return $url;
     }
 
     public function setIcLsLanguages(array $languages): array

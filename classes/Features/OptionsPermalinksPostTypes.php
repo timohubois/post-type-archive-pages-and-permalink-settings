@@ -176,7 +176,7 @@ final class OptionsPermalinksPostTypes
                         value="<?php echo esc_attr($value) ?>"
                         placeholder="<?php echo esc_attr($placeholder) ?>"
                     />
-                    <code>/%postname%/</code><br>
+                    <code><?php echo esc_html(user_trailingslashit('/%postname%')); ?></code><br>
                     <span class="description">
                         <?php echo esc_html($description) ?>
                     </span>
