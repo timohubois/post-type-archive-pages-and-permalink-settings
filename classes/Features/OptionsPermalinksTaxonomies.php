@@ -171,7 +171,7 @@ final class OptionsPermalinksTaxonomies
                         value="<?php echo esc_attr($value) ?>"
                         placeholder="<?php echo esc_attr($placeholder) ?>"
                     />
-                    <code>/%taxonomyname%/</code>
+                    <code><?php echo esc_html(user_trailingslashit('/%taxonomyname%', 'category')); ?></code>
                 </label><br>
             <?php }
             ?>

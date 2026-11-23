@@ -3,7 +3,7 @@
 PTAPS - Post Type Archive Pages and Permalink Settings associates existing pages with custom post type archives and lets you set URL bases for custom post types and taxonomies through the native WordPress settings screens.
 
 - **Settings > Reading:** select an existing page for each public custom post type's archive.
-- **Settings > Permalinks:** set single-post and taxonomy URL bases. A selected archive page's path supplies the default post type base unless you enter an override.
+- **Settings > Permalinks:** set single-post and taxonomy URL bases. A selected archive page's path supplies the default post type base unless you enter an override. The trailing slash follows the site-wide permalink structure.
 
 ## Requirements
 
@@ -113,6 +113,14 @@ composer php:lint
 ```
 
 Keep plugin code compatible with PHP 8.3 when using newer development tools.
+
+### Permalink regression checks
+
+On a test site with a public custom post type and taxonomy, repeat these checks with both `/%postname%` and `/%postname%/`:
+
+- Check that the single-post and taxonomy suffixes in **Settings > Permalinks** match the selected format.
+- With WPML in directory mode, assign an archive page and translate it and a post. Check that editor permalinks, single-post links and archive links use the right language path and open without a redirect. Repeat with a translated custom post type base and check that using it does not change the archive path.
+- Check that archive `hreflang` links and Yoast's archive canonical and pagination links use the same slash format as the URLs they point to.
 
 ## License
 

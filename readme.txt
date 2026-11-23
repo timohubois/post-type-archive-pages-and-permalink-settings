@@ -3,7 +3,7 @@ Contributors: timohubois
 Tags: custom post types, custom taxonomy, archives, permalink
 Requires at least: 6.5
 Tested up to: 7.1
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 Requires PHP: 8.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -123,6 +123,10 @@ See the [PHP example](https://github.com/timohubois/post-type-archive-pages-and-
 Report issues or contribute on [GitHub](https://github.com/timohubois/post-type-archive-pages-and-permalink-settings/).
 
 == Changelog ==
+
+= 2.3.2 =
+* Respect the WordPress trailing-slash setting in WPML permalinks and Yoast archive links.
+* Show the configured trailing-slash format in post type and taxonomy permalink settings.
 
 = 2.3.1 =
 * Restore the archive Edit Page toolbar icon on WordPress 7.2.

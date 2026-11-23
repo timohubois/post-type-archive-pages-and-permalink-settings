@@ -239,7 +239,6 @@ final class Yoast
         unset($archiveUrl['query']);
         $port = isset($archiveUrl['port']) ? ':' . $archiveUrl['port'] : '';
         $archiveUrl = $archiveUrl['scheme'] . '://' . $archiveUrl['host'] . $port . $archiveUrl['path'];
-        $archiveUrl = rtrim($archiveUrl, '/');
 
         global $wp_rewrite;
         $pagedPaginationBase = $wp_rewrite->pagination_base;
@@ -248,11 +247,12 @@ final class Yoast
         $pageNumberFromUrl = explode($pagedPaginationBase . '/', $originalUrl);
         $pageNumberFromUrl = (int)$pageNumberFromUrl[count($pageNumberFromUrl) - 1];
 
-        $isUrlPaged = $pageNumberFromUrl > 0;
-        if ($isUrlPaged) {
-            $newLink = trailingslashit(trailingslashit($archiveUrl) . $pagedPaginationBase . '/' . $pageNumberFromUrl);
-        } else {
-            $newLink = trailingslashit($archiveUrl);
+        $newLink = $archiveUrl;
+        if ($pageNumberFromUrl > 0) {
+            $newLink = trailingslashit($archiveUrl) . user_trailingslashit(
+                $pagedPaginationBase . '/' . $pageNumberFromUrl,
+                'paged'
+            );
         }
 
         return $this->maybeAddQueryStringToUrl($newLink);
