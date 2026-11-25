@@ -8,7 +8,7 @@ Requires PHP: 8.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Associate existing pages with custom post type archives and customize URL bases for custom post types and taxonomies.
+Use an existing page's URL for a custom post type archive and customize post type and taxonomy permalinks.
 
 == Description ==
 
